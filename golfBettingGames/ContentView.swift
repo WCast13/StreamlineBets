@@ -6,8 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
+    
+    @Query private var players: [Player]
+    @Query private var games: [Game]
+    
     var body: some View {
         VStack {
             Image(systemName: "globe")
