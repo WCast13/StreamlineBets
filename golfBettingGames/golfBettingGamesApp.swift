@@ -14,6 +14,6 @@ struct golfBettingGamesApp: App {
         WindowGroup {
             ContentView()
         }
-//        .modelContainer(ModelContainer.golfBettingCalculator)
+        .modelContainer(ModelContainer.golfBettingContainer)
     }
 }

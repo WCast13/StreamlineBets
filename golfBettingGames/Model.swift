@@ -34,6 +34,12 @@ final class Player {
         self.games = []
     }
     
+    
+    
+    
+    
+    
+    
     // Calculate course handicap based on course rating and slope
     func courseHandicap(courseRating: Double, slopeRating: Double, par: Int) -> Int {
         let courseHandicap = (handicapIndex * slopeRating / 113) + (courseRating - Double(par))
