@@ -400,9 +400,10 @@ struct QuickScoreEntry: View {
                 // Calculate net score
                 if let player = score.player,
                    let game = round.game {
+                    
                     let courseHandicap = player.courseHandicap(
-                        courseRating: game.courseRating,
-                        slopeRating: game.slopeRating,
+                        courseRating: game.effectiveRating,
+                        slopeRating: Double(game.effectiveSlope),
                         par: game.par
                     )
                     

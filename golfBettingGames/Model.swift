@@ -34,12 +34,6 @@ final class Player {
         self.games = []
     }
     
-    
-    
-    
-    
-    
-    
     // Calculate course handicap based on course rating and slope
     func courseHandicap(courseRating: Double, slopeRating: Double, par: Int) -> Int {
         let courseHandicap = (handicapIndex * slopeRating / 113) + (courseRating - Double(par))
@@ -50,6 +44,28 @@ final class Player {
 // MARK: - Game Model
 @Model
 final class Game {
+    // New Properties for Future Games
+    var course: Course?
+    var selectedTee: Tee?
+    var gender: Gender?
+    
+    // Helper to get the appropriate rating/slope
+    var effectiveRating: Double {
+        guard let tee = selectedTee, let gender = gender else {
+            return courseRating // fallback to legacy field
+        }
+        return tee.rating(for: gender)
+    }
+    
+    var effectiveSlope: Int {
+        guard let tee = selectedTee, let gender = gender else {
+            return Int(slopeRating) // fallback to legacy field
+        }
+        return tee.slope(for: gender)
+    }
+    
+    // Old Code Supporting Old Games- Will Edit unneeded properties when updating the app functionality
+    // TODO: - Delete the course index/rating
     var id: UUID
     var name: String
     var gameType: GameType
@@ -121,6 +137,85 @@ final class Round {
         self.roundType = roundType
         self.isCompleted = false
         self.scores = []
+    }
+}
+
+// MARK: - Tee Model
+
+@Model
+final class Tee {
+    var id: UUID
+    var name: String // e.g., "Blue", "White", "Red"
+    var menRating: Double
+    var menSlope: Int
+    var womenRating: Double
+    var womenSlope: Int
+    
+    // Relationship
+    var course: Course?
+    
+    init(
+        name: String,
+        menRating: Double = 72.0,
+        menSlope: Int = 113,
+        womenRating: Double = 72.0,
+        womenSlope: Int = 113
+    ) {
+        self.id = UUID()
+        self.name = name
+        self.menRating = menRating
+        self.menSlope = menSlope
+        self.womenRating = womenRating
+        self.womenSlope = womenSlope
+    }
+    
+    func rating(for gender: Gender) -> Double {
+        switch gender {
+        case .men: return menRating
+        case .women: return womenRating
+        }
+    }
+    
+    func slope(for gender: Gender) -> Int {
+        switch gender {
+        case .men: return menSlope
+        case .women: return womenSlope
+        }
+    }
+}
+
+enum Gender: String, CaseIterable, Codable {
+    case men = "Men"
+    case women = "Women"
+}
+
+// MARK: - Course Model
+@Model
+final class Course {
+    var id: UUID
+    var name: String
+    var par: Int
+    var isFavorite: Bool
+    
+    // Relationships
+    @Relationship(deleteRule: .cascade, inverse: \Tee.course)
+    var tees: [Tee]
+    
+    @Relationship(inverse: \Game.course)
+    var games: [Game]
+    
+    init(name: String, par: Int = 72) {
+        self.id = UUID()
+        self.name = name
+        self.par = par
+        self.isFavorite = false
+        self.tees = []
+        self.games = []
+    }
+    
+    var sortedTees: [Tee] {
+        // Sort tees by men's rating (typically correlates with difficulty)
+        tees.sorted { $0.menRating > $1.menRating }
     }
 }
 
@@ -249,3 +344,4 @@ extension ModelContainer {
         }
     }
 }
+

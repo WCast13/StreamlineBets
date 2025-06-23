@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SimplePlayerPicker: View {
     let players: [Player]
