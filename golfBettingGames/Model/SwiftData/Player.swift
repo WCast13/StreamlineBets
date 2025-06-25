@@ -17,12 +17,12 @@ final class Player {
     var createdDate: Date
     var isActive: Bool
     
-    //Relationships
+    // Relationships
     @Relationship(deleteRule: .cascade, inverse: \PlayerScore.player)
-    var scores: [PlayerScore]
+    var scores: [PlayerScore] = []
     
     @Relationship(inverse: \Game.players)
-    var games: [Game]
+    var games: [Game] = []
     
     init(name: String, handicapIndex: Double = 0.0) {
         self.id = UUID()
@@ -30,8 +30,6 @@ final class Player {
         self.handicapIndex = handicapIndex
         self.createdDate = Date()
         self.isActive = true
-        self.scores = []
-        self.games = []
     }
     
     // Calculate course handicap based on course rating and slope

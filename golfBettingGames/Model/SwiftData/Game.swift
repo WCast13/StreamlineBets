@@ -11,28 +11,6 @@ import SwiftData
 // MARK: - Game Model
 @Model
 final class Game {
-    // New Properties for Future Games
-    var course: Course?
-    var selectedTee: Tee?
-    var gender: Gender?
-    
-    // Helper to get the appropriate rating/slope
-    var effectiveRating: Double {
-        guard let tee = selectedTee, let gender = gender else {
-            return courseRating // fallback to legacy field
-        }
-        return tee.rating(for: gender)
-    }
-    
-    var effectiveSlope: Int {
-        guard let tee = selectedTee, let gender = gender else {
-            return Int(slopeRating) // fallback to legacy field
-        }
-        return tee.slope(for: gender)
-    }
-    
-    // Old Code Supporting Old Games- Will Edit unneeded properties when updating the app functionality
-    // TODO: - Delete the course index/rating
     var id: UUID
     var name: String
     var gameType: GameType
@@ -44,11 +22,16 @@ final class Game {
     var isCompleted: Bool
     var notes: String
     
+    // New properties for course integration
+    var course: Course?
+    var selectedTee: Tee?
+    var selectedGender: Gender?
+    
     // Relationships
     @Relationship(deleteRule: .cascade, inverse: \Round.game)
-    var rounds: [Round]
+    var rounds: [Round] = []
     
-    var players: [Player]
+    var players: [Player] = []
     
     init(name: String, gameType: GameType, courseName: String, courseRating: Double = 72.0, slopeRating: Double = 113.0, par: Int = 72) {
         self.id = UUID()
@@ -61,8 +44,21 @@ final class Game {
         self.par = par
         self.isCompleted = false
         self.notes = ""
-        self.rounds = []
-        self.players = []
+    }
+    
+    // Helper to get the appropriate rating/slope
+    var effectiveRating: Double {
+        guard let tee = selectedTee, let gender = selectedGender else {
+            return courseRating
+        }
+        return tee.rating(for: gender)
+    }
+    
+    var effectiveSlope: Int {
+        guard let tee = selectedTee, let gender = selectedGender else {
+            return Int(slopeRating)
+        }
+        return tee.slope(for: gender)
     }
     
     // Calculate total winnings/losses for a player in this game
