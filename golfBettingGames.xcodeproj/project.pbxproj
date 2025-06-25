@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E17E66662E0B8EE000423E86 /* CurrentStandingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E17E66652E0B8EE000423E86 /* CurrentStandingsView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		E17E66652E0B8EE000423E86 /* CurrentStandingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentStandingsView.swift; sourceTree = "<group>"; };
 		E18DB6A72E044E1C007D5E2D /* golfBettingGames.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = golfBettingGames.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -34,6 +39,7 @@
 			children = (
 				E18DB6A92E044E1D007D5E2D /* golfBettingGames */,
 				E18DB6A82E044E1C007D5E2D /* Products */,
+				E17E66652E0B8EE000423E86 /* CurrentStandingsView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -119,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E17E66662E0B8EE000423E86 /* CurrentStandingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
