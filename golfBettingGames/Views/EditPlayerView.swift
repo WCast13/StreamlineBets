@@ -26,10 +26,14 @@ struct EditPlayerView: View {
                     TextField("Name", text: $name)
                         .textContentType(.name)
                     
-                    Stepper("Handicap: \(handicapIndex, specifier: "%.1f")",
-                           value: $handicapIndex,
-                           in: 0...54,
-                           step: 0.1)
+                    HStack {
+                        Text("Handicap Index")
+                        Spacer()
+                        TextField("0.0", value: $handicapIndex, format: .number.precision(.fractionLength(1)))
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 80)
+                    }
                 }
                 
                 Section {

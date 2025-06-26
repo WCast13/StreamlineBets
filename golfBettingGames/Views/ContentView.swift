@@ -20,7 +20,6 @@ struct ContentView: View {
     
     var body: some View {
         NavigationSplitView {
-            // Sidebar for iPad
             List(selection: $selectedGame) {
                 Section("Active Games") {
                     ForEach(activeGames) { game in
@@ -76,7 +75,4 @@ struct ContentView: View {
         games.filter { $0.isCompleted }
             .sorted { $0.date > $1.date }
     }
-}
-#Preview {
-    ContentView()
 }

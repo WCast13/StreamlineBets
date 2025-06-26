@@ -7,6 +7,7 @@
 
 // MARK: - PlayerPickerView.swift
 import SwiftUI
+import SwiftData
 
 struct PlayerPickerView: View {
     @Environment(\.dismiss) private var dismiss
@@ -49,5 +50,3 @@ struct PlayerPickerView: View {
         }
     }
 }
-
-

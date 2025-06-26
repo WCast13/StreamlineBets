@@ -16,7 +16,6 @@ struct GameDetailView: View {
     
     var body: some View {
         List {
-            // Game Summary Section
             Section {
                 LabeledContent("Course", value: game.courseName)
                 LabeledContent("Game Type", value: game.gameType.description)
@@ -32,7 +31,6 @@ struct GameDetailView: View {
                 Text("Game Information")
             }
             
-            // Player Standings Section
             Section {
                 ForEach(game.players.sorted { $0.name < $1.name }) { player in
                     HStack {
@@ -47,7 +45,6 @@ struct GameDetailView: View {
                 Text("Standings")
             }
             
-            // Rounds Section
             Section {
                 ForEach(game.rounds.sorted { $0.date > $1.date }) { round in
                     Button(action: { selectedRound = round }) {
@@ -80,9 +77,6 @@ struct GameDetailView: View {
         }
         .sheet(item: $selectedRound) { round in
             RoundDetailView(round: round)
-        }
-        NavigationLink("Start Scoring") {
-            LiveScoringView(game: game)
         }
     }
     
