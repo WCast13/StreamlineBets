@@ -5,7 +5,7 @@
 //  Created by William Castellano on 6/24/25.
 //
 
-import SwiftUI
+import Foundation
 import SwiftData
 
 // MARK: - Game Model
@@ -31,7 +31,7 @@ final class Game {
     @Relationship(deleteRule: .cascade, inverse: \Round.game)
     var rounds: [Round] = []
     
-    var players: [Player] = []
+    @Relationship var players: [Player] = []
     
     init(name: String, gameType: GameType, courseName: String, courseRating: Double = 72.0, slopeRating: Double = 113.0, par: Int = 72) {
         self.id = UUID()

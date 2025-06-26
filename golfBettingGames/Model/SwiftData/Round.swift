@@ -8,12 +8,14 @@
 import SwiftUI
 import SwiftData
 
-// MARK: - Round Model
+// MARK: - Updated Round Model
 @Model
 final class Round {
     var id: UUID
     var roundNumber: Int
-    var holeNumber: Int?
+    var holeNumber: Int? // For single hole bets
+    var startingHole: Int // For tracking which hole they started on (1 or 10)
+    var holesPlayed: Int // Number of holes completed
     var date: Date
     var betAmount: Double
     var roundType: RoundType
@@ -25,7 +27,7 @@ final class Round {
     @Relationship(deleteRule: .cascade, inverse: \PlayerScore.round)
     var scores: [PlayerScore] = []
     
-    init(roundNumber: Int, holeNumber: Int? = nil, betAmount: Double, roundType: RoundType) {
+    init(roundNumber: Int, holeNumber: Int? = nil, betAmount: Double, roundType: RoundType, startingHole: Int = 1) {
         self.id = UUID()
         self.roundNumber = roundNumber
         self.holeNumber = holeNumber
@@ -33,5 +35,7 @@ final class Round {
         self.betAmount = betAmount
         self.roundType = roundType
         self.isCompleted = false
+        self.startingHole = startingHole
+        self.holesPlayed = 0
     }
 }

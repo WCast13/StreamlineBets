@@ -16,9 +16,11 @@ extension ModelContainer {
             Player.self,
             Course.self,
             Tee.self,
+            Hole.self,
             Game.self,
             Round.self,
-            PlayerScore.self
+            PlayerScore.self,
+            HoleScore.self
         ])
         
         let modelConfiguration = ModelConfiguration(
