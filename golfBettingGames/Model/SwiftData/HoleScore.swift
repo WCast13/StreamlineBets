@@ -26,7 +26,20 @@ final class HoleScore {
     }
     
     var netScore: Int {
-        // This will be calculated based on strokes received on this hole
-        return grossScore // Placeholder - will be updated with proper handicap calculation
+        guard let playerScore = playerScore,
+              let player = playerScore.player,
+              let round = playerScore.round,
+              let game = round.game,
+              let hole = hole else { return grossScore }
+        
+        let courseHandicap = player.courseHandicap(
+            courseRating: game.effectiveRating,
+            slopeRating: Double(game.effectiveSlope),
+            par: game.par
+        )
+        
+        // Calculate strokes on this hole based on handicap
+        let strokesOnHole = courseHandicap >= hole.handicap ? 1 : 0
+        return grossScore - strokesOnHole
     }
 }

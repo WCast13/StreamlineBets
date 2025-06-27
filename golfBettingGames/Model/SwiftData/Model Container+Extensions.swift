@@ -5,11 +5,10 @@
 //  Created by William Castellano on 6/25/25.
 //
 
-
+// MARK: - Updated SwiftData Model Container
 import Foundation
 import SwiftData
 
-// MARK: - SwiftData Model Container
 extension ModelContainer {
     static var golfBettingContainer: ModelContainer = {
         let schema = Schema([

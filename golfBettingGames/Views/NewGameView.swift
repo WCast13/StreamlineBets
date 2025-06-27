@@ -14,15 +14,21 @@ struct NewGameView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Query private var allPlayers: [Player]
+    @Query(sort: \Course.name) private var courses: [Course]
     
     @State private var gameName = ""
     @State private var gameType: GameType = .skins
-    @State private var courseName = ""
-    @State private var courseRating = 72.0
-    @State private var slopeRating = 113.0
-    @State private var par = 72
+    @State private var selectedCourse: Course?
+    @State private var selectedTee: Tee?
+    @State private var selectedGender: Gender = .men
     @State private var selectedPlayers: Set<Player> = []
     @State private var showingPlayerPicker = false
+    @State private var showingCoursePicker = false
+    @State private var showingCourseManager = false
+    
+    private var canCreateGame: Bool {
+        !gameName.isEmpty && selectedCourse != nil && selectedTee != nil && selectedPlayers.count >= 2
+    }
     
     var body: some View {
         NavigationStack {
@@ -35,26 +41,95 @@ struct NewGameView: View {
                             Text(type.description).tag(type)
                         }
                     }
+                    
+                    DatePicker("Date", selection: .constant(Date()), displayedComponents: .date)
+                        .disabled(true)
                 }
                 
-                Section("Course Information") {
-                    TextField("Course Name", text: $courseName)
-                    
-                    LabeledContent("Course Rating") {
-                        TextField("Rating", value: $courseRating, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 80)
+                Section("Course Selection") {
+                    if selectedCourse == nil {
+                        Button(action: { showingCoursePicker = true }) {
+                            Label("Select Course", systemImage: "flag.circle")
+                                .foregroundColor(.accentColor)
+                        }
+                    } else {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(selectedCourse!.name)
+                                .font(.headline)
+                            
+                            if !selectedCourse!.city.isEmpty {
+                                Text("\(selectedCourse!.city), \(selectedCourse!.state)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            HStack {
+                                Text("Par \(selectedCourse!.par)")
+                                    .font(.caption)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 2)
+                                    .background(Color.secondary.opacity(0.2))
+                                    .cornerRadius(4)
+                                
+                                if let tee = selectedTee {
+                                    Text("\(tee.name) • \(tee.rating(for: selectedGender), specifier: "%.1f") / \(tee.slope(for: selectedGender))")
+                                        .font(.caption)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 2)
+                                        .background(Color.accentColor.opacity(0.2))
+                                        .cornerRadius(4)
+                                }
+                            }
+                            
+                            Button("Change Course") {
+                                showingCoursePicker = true
+                            }
+                            .font(.caption)
+                        }
                     }
                     
-                    LabeledContent("Slope Rating") {
-                        TextField("Slope", value: $slopeRating, format: .number)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 80)
+                    if courses.isEmpty {
+                        Button(action: { showingCourseManager = true }) {
+                            Label("Add Courses", systemImage: "plus.circle")
+                                .font(.caption)
+                        }
                     }
-                    
-                    Stepper("Par: \(par)", value: $par, in: 60...80)
+                }
+                
+                if selectedCourse != nil {
+                    Section("Tee Selection") {
+                        Picker("Playing As", selection: $selectedGender) {
+                            ForEach(Gender.allCases, id: \.self) { gender in
+                                Text(gender.rawValue).tag(gender)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        
+                        if let course = selectedCourse {
+                            ForEach(course.sortedTees) { tee in
+                                Button(action: { selectedTee = tee }) {
+                                    HStack {
+                                        VStack(alignment: .leading) {
+                                            Text(tee.name)
+                                                .font(.headline)
+                                                .foregroundColor(.primary)
+                                            Text("\(tee.rating(for: selectedGender), specifier: "%.1f") / \(tee.slope(for: selectedGender))")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        if selectedTee == tee {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundColor(.accentColor)
+                                        }
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
                 }
                 
                 Section {
@@ -65,8 +140,23 @@ struct NewGameView: View {
                     } else {
                         ForEach(Array(selectedPlayers).sorted { $0.name < $1.name }) { player in
                             HStack {
-                                Text(player.name)
+                                VStack(alignment: .leading) {
+                                    Text(player.name)
+                                    
+                                    if let course = selectedCourse, let tee = selectedTee {
+                                        let ch = player.courseHandicap(
+                                            courseRating: tee.rating(for: selectedGender),
+                                            slopeRating: Double(tee.slope(for: selectedGender)),
+                                            par: course.par
+                                        )
+                                        Text("Course Handicap: \(ch)")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                
                                 Spacer()
+                                
                                 Button(action: { selectedPlayers.remove(player) }) {
                                     Image(systemName: "xmark.circle.fill")
                                         .foregroundColor(.secondary)
@@ -81,6 +171,11 @@ struct NewGameView: View {
                     }
                 } header: {
                     Text("Players (\(selectedPlayers.count) selected)")
+                } footer: {
+                    if selectedPlayers.count < 2 {
+                        Text("Select at least 2 players")
+                            .foregroundColor(.orange)
+                    }
                 }
             }
             .navigationTitle("New Game")
@@ -92,7 +187,7 @@ struct NewGameView: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Create") { createGame() }
-                        .disabled(gameName.isEmpty || courseName.isEmpty || selectedPlayers.count < 2)
+                        .disabled(!canCreateGame)
                 }
             }
             .sheet(isPresented: $showingPlayerPicker) {
@@ -101,18 +196,34 @@ struct NewGameView: View {
                     selectedPlayers: $selectedPlayers
                 )
             }
+            .sheet(isPresented: $showingCoursePicker) {
+                CoursePicker(
+                    selectedCourse: $selectedCourse,
+                    selectedTee: $selectedTee,
+                    selectedGender: $selectedGender
+                )
+            }
+            .sheet(isPresented: $showingCourseManager) {
+                CourseListView()
+            }
         }
     }
     
     private func createGame() {
+        guard let course = selectedCourse, let tee = selectedTee else { return }
+        
         let game = Game(
             name: gameName,
             gameType: gameType,
-            courseName: courseName,
-            courseRating: courseRating,
-            slopeRating: slopeRating,
-            par: par
+            courseName: course.name,
+            courseRating: tee.rating(for: selectedGender),
+            slopeRating: Double(tee.slope(for: selectedGender)),
+            par: course.par
         )
+        
+        game.course = course
+        game.selectedTee = tee
+        game.selectedGender = selectedGender
         game.players = Array(selectedPlayers)
         
         modelContext.insert(game)
