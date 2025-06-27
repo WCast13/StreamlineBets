@@ -196,13 +196,13 @@ struct NewGameView: View {
                     selectedPlayers: $selectedPlayers
                 )
             }
-            .sheet(isPresented: $showingCoursePicker) {
-                CoursePicker(
-                    selectedCourse: $selectedCourse,
-                    selectedTee: $selectedTee,
-                    selectedGender: $selectedGender
-                )
-            }
+//            .sheet(isPresented: $showingCoursePicker) {
+//                CoursePicker(
+//                    selectedCourse: $selectedCourse,
+//                    selectedTee: $selectedTee,
+//                    selectedGender: $selectedGender
+//                )
+//            }
             .sheet(isPresented: $showingCourseManager) {
                 CourseListView()
             }

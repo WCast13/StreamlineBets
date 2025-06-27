@@ -26,10 +26,13 @@ struct AddPlayerView: View {
                     HStack {
                         Text("Handicap Index")
                         Spacer()
-                        TextField("0.0", value: $handicapIndex, format: .number.precision(.fractionLength(1)))
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 80)
+                        Picker("Handicap Index", selection: $handicapIndex) {
+                            ForEach(Array(stride(from: 0.0, through: 36.0, by: 0.1)), id: \.self) { value in
+                                Text(String(format: "%.1f", value)).tag(value)
+                            }
+                        }
+                        .pickerStyle(.wheel)
+                        .frame(width: 100, height: 100)
                     }
                 }
             }
