@@ -83,14 +83,19 @@ struct PlayerScorecardView: View {
                     }
                 }
             }
-//            .sheet(item: $editingHole) { holeNumber in
-//                HoleScoreEditView(
-//                    playerScore: playerScore,
-//                    holeNumber: holeNumber,
-//                    hole: course?.holes.first(where: { $0.number == holeNumber }),
-//                    courseHandicap: courseHandicap
-//                )
-//            }
+            .sheet(isPresented: Binding(
+                get: { editingHole != nil },
+                set: { if !$0 { editingHole = nil } }
+            )) {
+                if let holeNumber = editingHole {
+                    HoleScoreEditView(
+                        playerScore: playerScore,
+                        holeNumber: holeNumber,
+                        hole: course?.holes.first(where: { $0.number == holeNumber }),
+                        courseHandicap: courseHandicap
+                    )
+                }
+            }
         }
     }
 }

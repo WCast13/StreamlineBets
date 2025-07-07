@@ -10,10 +10,19 @@ import SwiftData
 
 @main
 struct golfBettingGamesApp: App {
+    let container = ModelContainer.golfBettingContainer
+    
+    init() {
+        // Create initial data if needed
+        if let context = try? container.mainContext {
+            DataInitializer.createInitialDataIfNeeded(in: context)
+        }
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(ModelContainer.golfBettingContainer)
+        .modelContainer(container)
     }
 }
