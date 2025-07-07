@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E1CE9D522E1C4FF600BEC78F /* ScoringTipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1CE9D512E1C4FF600BEC78F /* ScoringTipView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		E18DB6A72E044E1C007D5E2D /* golfBettingGames.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = golfBettingGames.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1CE9D512E1C4FF600BEC78F /* ScoringTipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringTipView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -34,6 +39,7 @@
 			children = (
 				E18DB6A92E044E1D007D5E2D /* golfBettingGames */,
 				E18DB6A82E044E1C007D5E2D /* Products */,
+				E1CE9D512E1C4FF600BEC78F /* ScoringTipView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -119,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1CE9D522E1C4FF600BEC78F /* ScoringTipView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

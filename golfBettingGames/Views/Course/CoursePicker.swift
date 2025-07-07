@@ -19,6 +19,8 @@ struct CoursePicker: View {
     @State private var showingAddCourse = false
     @State private var showingTeeSelection = false
     
+    @State private var tempSelectedCourse: Course?
+    
     var body: some View {
         NavigationStack {
             List {

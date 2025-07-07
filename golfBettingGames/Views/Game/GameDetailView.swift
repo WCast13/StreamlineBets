@@ -13,7 +13,6 @@ struct GameDetailView: View {
     @Bindable var game: Game
     @State private var showingNewRound = false
     @State private var selectedRound: Round?
-    @State private var showingLiveScoring = false
     
     private var incompleteRounds: [Round] {
         game.rounds.filter { !$0.isCompleted }
