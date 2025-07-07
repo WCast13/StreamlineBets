@@ -9,6 +9,8 @@ struct RoundDetailView: View {
     @Bindable var round: Round
     @State private var editingScore: PlayerScore?
     @State private var showingDeleteAlert = false
+    @State private var showingWinningsCalculator = false
+    @State private var showingLiveScoring = false
     
     private var sortedScores: [PlayerScore] {
         round.scores.sorted {

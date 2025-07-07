@@ -25,7 +25,14 @@ struct QuickBetButton: View {
         }
     }
 }
-//
-//#Preview {
-//    QuickBetButton(amount: , isSelected: <#Bool#>, formatter: <#NumberFormatter#>, action: <#() -> Void#>)
-//}
+
+#Preview {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .currency
+    
+    return HStack {
+        QuickBetButton(amount: 10, isSelected: false, formatter: formatter) { }
+        QuickBetButton(amount: 20, isSelected: true, formatter: formatter) { }
+    }
+    .padding()
+}
