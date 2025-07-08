@@ -24,6 +24,7 @@ struct RoundSetupView: View {
     @State private var alertMessage = ""
     @State private var createdRound: Round?
     @State private var showingLiveScoring = false
+    @State private var shouldStartScoring = false
     
     private var canCreateRound: Bool {
         selectedPlayers.count >= 2 && betAmount > 0

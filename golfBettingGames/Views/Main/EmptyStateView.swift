@@ -130,10 +130,9 @@ struct EmptyStateView: View {
 struct ActiveRoundCard: View {
     let game: Game
     let round: Round
-    @State private var showingLiveScoring = false
     
     var body: some View {
-        Button(action: { showingLiveScoring = true }) {
+        NavigationLink(destination: LiveScoringView(round: round)) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Image(systemName: "flag.circle.fill")
@@ -187,9 +186,6 @@ struct ActiveRoundCard: View {
             .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
         .buttonStyle(.plain)
-        .fullScreenCover(isPresented: $showingLiveScoring) {
-            LiveScoringView(round: round)
-        }
     }
 }
 
@@ -219,4 +215,3 @@ struct QuickStartItem: View {
         .frame(maxWidth: 150)
     }
 }
-

@@ -40,8 +40,6 @@ struct QuickScoreButton: View {
         }
     }
     
-    @State private var showingLiveScoring = false
-    
     private var buttonLabel: String {
         if round.holesPlayed == 0 {
             return "Start Scoring"
@@ -51,7 +49,7 @@ struct QuickScoreButton: View {
     }
     
     var body: some View {
-        Button(action: { showingLiveScoring = true }) {
+        NavigationLink(destination: LiveScoringView(round: round)) {
             VStack(spacing: 4) {
                 Image(systemName: "flag.circle.fill")
                     .font(size.iconSize)
@@ -75,9 +73,6 @@ struct QuickScoreButton: View {
             .shadow(color: Color.orange.opacity(0.3), radius: 4, x: 0, y: 2)
         }
         .buttonStyle(.plain)
-        .fullScreenCover(isPresented: $showingLiveScoring) {
-            LiveScoringView(round: round)
-        }
     }
 }
 
@@ -92,33 +87,35 @@ struct FloatingScoreButton: View {
 }
 
 #Preview {
-    VStack(spacing: 20) {
-        QuickScoreButton(
-            round: Round(
-                roundNumber: 1,
-                betAmount: 20,
-                roundType: .full18
-            ),
-            size: .small
-        )
-        
-        QuickScoreButton(
-            round: Round(
-                roundNumber: 1,
-                betAmount: 20,
-                roundType: .full18
-            ),
-            size: .regular
-        )
-        
-        QuickScoreButton(
-            round: Round(
-                roundNumber: 1,
-                betAmount: 20,
-                roundType: .full18
-            ),
-            size: .large
-        )
+    NavigationStack {
+        VStack(spacing: 20) {
+            QuickScoreButton(
+                round: Round(
+                    roundNumber: 1,
+                    betAmount: 20,
+                    roundType: .full18
+                ),
+                size: .small
+            )
+            
+            QuickScoreButton(
+                round: Round(
+                    roundNumber: 1,
+                    betAmount: 20,
+                    roundType: .full18
+                ),
+                size: .regular
+            )
+            
+            QuickScoreButton(
+                round: Round(
+                    roundNumber: 1,
+                    betAmount: 20,
+                    roundType: .full18
+                ),
+                size: .large
+            )
+        }
+        .padding()
     }
-    .padding()
 }

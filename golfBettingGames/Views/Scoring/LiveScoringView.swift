@@ -5,7 +5,6 @@
 //  Created by William Castellano on 7/7/25.
 //
 
-
 import SwiftUI
 import SwiftData
 
@@ -214,9 +213,14 @@ struct LiveScoringView: View {
     
     private func loadExistingScores() {
         scores.removeAll()
+        let defaultScore = currentHoleInfo?.par ?? 4 // Default to par 4 if no hole info
+        
         for playerScore in round.scores {
             if let holeScore = playerScore.holeScores.first(where: { $0.holeNumber == currentHoleNumber }) {
                 scores[playerScore.id] = holeScore.grossScore
+            } else {
+                // Initialize to par if no existing score
+                scores[playerScore.id] = defaultScore
             }
         }
     }

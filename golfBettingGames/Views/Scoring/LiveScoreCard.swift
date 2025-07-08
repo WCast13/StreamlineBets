@@ -54,34 +54,61 @@ struct LiveScoreCard: View {
                 }
             }
             
-            // Score Selection - Large buttons for easy tapping
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 5), spacing: 12) {
-                ForEach(1...10, id: \.self) { num in
-                    Button(action: {
-                        score = num
-                        // Haptic feedback
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    }) {
-                        Text("\(num)")
-                            .font(.title2)
-                            .fontWeight(score == num ? .bold : .medium)
-                            .frame(maxWidth: .infinity, minHeight: 60)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(score == num ? Color.accentColor : Color(UIColor.tertiarySystemBackground))
-                            )
-                            .foregroundColor(score == num ? .white : .primary)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(score == num ? Color.clear : Color.gray.opacity(0.3), lineWidth: 1)
-                            )
+            // Score Entry with Stepper - CHANGED FROM BUTTON GRID
+            VStack(spacing: 12) {
+                HStack {
+                    Text("Gross Score")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    Spacer()
+                    
+                    // Score display and stepper
+                    HStack(spacing: 16) {
+                        Button(action: {
+                            if score > 1 {
+                                score -= 1
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            }
+                        }) {
+                            Image(systemName: "minus.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(score > 1 ? .accentColor : .gray)
+                        }
+                        .disabled(score <= 1)
+                        
+                        Text("\(score)")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .frame(minWidth: 50)
+                            .foregroundColor(.primary)
+                        
+                        Button(action: {
+                            if score < 12 {
+                                score += 1
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            }
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(score < 12 ? .accentColor : .gray)
+                        }
+                        .disabled(score >= 12)
                     }
-                    .buttonStyle(.plain)
+                }
+                
+                // Score relative to par indicator - NEW
+                if let hole = holeInfo {
+                    HStack {
+                        Spacer()
+                        ScoreToPar(score: score, par: hole.par)
+                        Spacer()
+                    }
                 }
             }
             
             // Net Score Display
-            if score > 0 && strokesOnHole > 0 {
+            if strokesOnHole > 0 {
                 HStack {
                     Text("Net Score: \(score - strokesOnHole)")
                         .font(.subheadline)
@@ -94,5 +121,46 @@ struct LiveScoreCard: View {
         .padding()
         .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(16)
+    }
+}
+
+// Helper view to show score relative to par
+struct ScoreToPar: View {
+    let score: Int
+    let par: Int
+    
+    private var difference: Int { score - par }
+    
+    private var label: String {
+        switch difference {
+        case ..<(-2): return "Eagle or better"
+        case -2: return "Eagle"
+        case -1: return "Birdie"
+        case 0: return "Par"
+        case 1: return "Bogey"
+        case 2: return "Double Bogey"
+        case 3: return "Triple Bogey"
+        default: return "+\(difference)"
+        }
+    }
+    
+    private var color: Color {
+        switch difference {
+        case ..<0: return .green
+        case 0: return .primary
+        case 1: return .orange
+        default: return .red
+        }
+    }
+    
+    var body: some View {
+        Text(label)
+            .font(.caption)
+            .fontWeight(.medium)
+            .foregroundColor(color)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.1))
+            .cornerRadius(8)
     }
 }

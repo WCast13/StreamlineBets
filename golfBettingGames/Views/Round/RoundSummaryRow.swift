@@ -9,7 +9,6 @@ import SwiftUI
 
 struct RoundSummaryRow: View {
     let round: Round
-    @State private var showingLiveScoring = false
     
     private var scoringProgress: (completed: Int, total: Int) {
         let totalHoles = round.roundType == .hole ? 1 : (round.roundType == .front9 || round.roundType == .back9 ? 9 : 18)
@@ -92,7 +91,7 @@ struct RoundSummaryRow: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else {
-                    Button(action: { showingLiveScoring = true }) {
+                    NavigationLink(destination: LiveScoringView(round: round)) {
                         VStack(spacing: 2) {
                             Image(systemName: "play.circle.fill")
                                 .font(.title2)
@@ -109,9 +108,5 @@ struct RoundSummaryRow: View {
         }
         .padding(.vertical, 8)
         .contentShape(Rectangle())
-        .fullScreenCover(isPresented: $showingLiveScoring) {
-            LiveScoringView(round: round)
-        }
     }
 }
-

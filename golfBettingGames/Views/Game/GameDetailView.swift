@@ -38,31 +38,33 @@ struct GameDetailView: View {
             }
             
             Section {
-                ForEach(game.players.sorted { $0.name < $1.name }) { player in
-                    Button(action: { selectedPlayer = player }) {
-                        HStack {
-                            Text(player.name)
-                            Spacer()
-                            Text(formatCurrency(game.totalForPlayer(player)))
-                                .foregroundColor(game.totalForPlayer(player) >= 0 ? .green : .red)
-                                .fontWeight(.medium)
-                            Image(systemName: "chevron.right")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                }
-            } header: {
-                Text("Standings")
-            }
-            
-            Section {
                 ForEach(game.rounds.sorted { $0.date > $1.date }) { round in
                     Button(action: { selectedRound = round }) {
                         RoundSummaryRow(round: round)
                     }
                     .buttonStyle(.plain)
+                }
+            } header: {
+                HStack {
+                    Text("Rounds")
+                    Spacer()
+                    Button("Add Round", systemImage: "plus.circle.fill") {
+                        showingNewRound = true
+                    }
+                    .font(.caption)
+                }
+            }
+            
+            Section {
+                ForEach(game.rounds.sorted { $0.date > $1.date }) { round in
+                    RoundSummaryRow(round: round)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            if round.isCompleted {
+                                selectedRound = round
+                            }
+                            // If not completed, RoundSummaryRow handles navigation internally
+                        }
                 }
             } header: {
                 HStack {
@@ -103,3 +105,4 @@ struct GameDetailView: View {
         return formatter.string(from: NSNumber(value: amount)) ?? "$0.00"
     }
 }
+
