@@ -86,3 +86,22 @@ struct GameRowView: View {
         .padding(.vertical, 4)
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
