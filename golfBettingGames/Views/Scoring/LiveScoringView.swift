@@ -279,13 +279,21 @@ struct LiveScoringView: View {
         
         switch game.gameType {
         case .skins:
-            calculateSkinsWinnings()
+            calculateSkinsWinnings()  // ✅ Uses your existing method
         case .nassau:
-            calculateNassauWinnings()
+            GameScoringCalculator.calculateNassauWinnings(for: round)  // ✅ Now supported
         case .matchPlay:
-            calculateMatchPlayWinnings()
-        default:
-            calculateStrokePlayWinnings()
+            GameScoringCalculator.calculateMatchPlayWinnings(for: round)  // ✅ Now supported
+        case .wolf:
+            GameScoringCalculator.calculateWolfWinnings(for: round)  // ✅ Now supported
+        case .bestBall:
+            GameScoringCalculator.calculateBestBallWinnings(for: round)  // ✅ Now supported
+        case .strokePlay:
+            GameScoringCalculator.calculateStrokePlayWinnings(for: round)  // ✅ Now supported
+        case .scramble:
+            GameScoringCalculator.calculateStrokePlayWinnings(for: round)  // ✅ Now supported
+        case .custom:
+            GameScoringCalculator.calculateStrokePlayWinnings(for: round)  // ✅ Now supported
         }
     }
     
