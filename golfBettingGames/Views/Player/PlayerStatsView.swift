@@ -179,3 +179,38 @@ struct PlayerStatsView: View {
         return formatter.string(from: NSNumber(value: amount)) ?? "$0"
     }
 }
+
+//// MARK: - StatCard Component
+//struct StatCard: View {
+//    let title: String
+//    let value: String
+//    let icon: String
+//    let color: Color
+//    
+//    var body: some View {
+//        VStack(alignment: .leading, spacing: 12) {
+//            HStack {
+//                Image(systemName: icon)
+//                    .font(.title2)
+//                    .foregroundColor(color)
+//                Spacer()
+//            }
+//            
+//            VStack(alignment: .leading, spacing: 4) {
+//                Text(value)
+//                    .font(.title)
+//                    .fontWeight(.bold)
+//                    .foregroundColor(color)
+//                
+//                Text(title)
+//                    .font(.caption)
+//                    .foregroundColor(.secondary)
+//            }
+//        }
+//        .padding()
+//        .background(color.opacity(0.1))
+//        .cornerRadius(12)
+//    }
+//}
+
+

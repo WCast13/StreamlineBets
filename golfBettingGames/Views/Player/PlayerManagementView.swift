@@ -16,6 +16,7 @@ struct PlayerManagementView: View {
     
     @State private var showingNewPlayer = false
     @State private var selectedPlayer: Player?
+    @State private var showingEditPlayer: Player?
     
     var body: some View {
         NavigationStack {
@@ -28,15 +29,23 @@ struct PlayerManagementView: View {
                     )
                 } else {
                     ForEach(players) { player in
-                        PlayerRow(player: player)
-                            .onTapGesture {
-                                selectedPlayer = player
+                        NavigationLink(value: player) {
+                            PlayerRow(player: player)
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button("Edit") {
+                                showingEditPlayer = player
                             }
+                            .tint(.blue)
+                        }
                     }
                     .onDelete(perform: deletePlayers)
                 }
             }
             .navigationTitle("Players")
+            .navigationDestination(for: Player.self) { player in
+                PlayerStatsView(player: player)
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Done") { dismiss() }
@@ -51,7 +60,7 @@ struct PlayerManagementView: View {
             .sheet(isPresented: $showingNewPlayer) {
                 AddPlayerView()
             }
-            .sheet(item: $selectedPlayer) { player in
+            .sheet(item: $showingEditPlayer) { player in
                 EditPlayerView(player: player)
             }
         }

@@ -13,6 +13,7 @@ struct GameDetailView: View {
     @Bindable var game: Game
     @State private var showingNewRound = false
     @State private var selectedRound: Round?
+    @State private var selectedPlayer: Player?
     
     private var incompleteRounds: [Round] {
         game.rounds.filter { !$0.isCompleted }
@@ -38,13 +39,19 @@ struct GameDetailView: View {
             
             Section {
                 ForEach(game.players.sorted { $0.name < $1.name }) { player in
-                    HStack {
-                        Text(player.name)
-                        Spacer()
-                        Text(formatCurrency(game.totalForPlayer(player)))
-                            .foregroundColor(game.totalForPlayer(player) >= 0 ? .green : .red)
-                            .fontWeight(.medium)
+                    Button(action: { selectedPlayer = player }) {
+                        HStack {
+                            Text(player.name)
+                            Spacer()
+                            Text(formatCurrency(game.totalForPlayer(player)))
+                                .foregroundColor(game.totalForPlayer(player) >= 0 ? .green : .red)
+                                .fontWeight(.medium)
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                     }
+                    .buttonStyle(.plain)
                 }
             } header: {
                 Text("Standings")
@@ -82,6 +89,11 @@ struct GameDetailView: View {
         }
         .sheet(item: $selectedRound) { round in
             RoundDetailView(round: round)
+        }
+        .sheet(item: $selectedPlayer) { player in
+            NavigationStack {
+                PlayerStatsView(player: player)
+            }
         }
     }
     

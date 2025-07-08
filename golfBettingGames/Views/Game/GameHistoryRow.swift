@@ -9,7 +9,7 @@
 import SwiftData
 import SwiftUI
 
-
+// MARK: - GameHistoryRow
 struct GameHistoryRow: View {
     let game: Game
     let player: Player
