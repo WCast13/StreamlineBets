@@ -14,7 +14,7 @@ struct RoundSetupView: View {
     
     let game: Game
     
-    @State private var roundType: RoundType = .hole
+    @State private var roundType: RoundType = .full18
     @State private var roundNumber: Int = 1
     @State private var holeNumber: Int = 1
     @State private var betAmount: Double = 10.0
