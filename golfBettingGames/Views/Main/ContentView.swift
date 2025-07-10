@@ -21,20 +21,34 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView {
             List(selection: $selectedGame) {
-                Section("Active Games") {
-                    ForEach(activeGames) { game in
-                        NavigationLink(value: game) {
-                            GameRowView(game: game)
+                if !activeGames.isEmpty {
+                    Section("Active Games") {
+                        ForEach(activeGames) { game in
+                            NavigationLink(value: game) {
+                                GameRowView(game: game)
+                            }
                         }
                     }
                 }
                 
-                Section("Completed Games") {
-                    ForEach(completedGames) { game in
-                        NavigationLink(value: game) {
-                            GameRowView(game: game)
+                // CHANGED: Show completed games separately
+                if !completedGames.isEmpty {
+                    Section("Completed Games") {
+                        ForEach(completedGames) { game in
+                            NavigationLink(value: game) {
+                                GameRowView(game: game)
+                            }
                         }
                     }
+                }
+                
+                // ADDED: Empty state when no games
+                if games.isEmpty {
+                    ContentUnavailableView(
+                        "No Games Yet",
+                        systemImage: "figure.golf",
+                        description: Text("Create your first game to get started")
+                    )
                 }
             }
             .navigationTitle("Golf Betting")

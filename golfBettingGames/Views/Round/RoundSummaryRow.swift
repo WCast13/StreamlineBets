@@ -91,18 +91,15 @@ struct RoundSummaryRow: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else {
-                    NavigationLink(destination: LiveScoringView(round: round)) {
-                        VStack(spacing: 2) {
-                            Image(systemName: "play.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.accentColor)
-                            
-                            Text("Continue")
-                                .font(.caption2)
-                                .foregroundColor(.accentColor)
-                        }
+                    VStack(spacing: 2) {
+                        Image(systemName: "play.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(.accentColor)
+                        
+                        Text("Continue")
+                            .font(.caption2)
+                            .foregroundColor(.accentColor)
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }

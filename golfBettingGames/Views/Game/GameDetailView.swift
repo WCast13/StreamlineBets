@@ -22,6 +22,7 @@ struct GameDetailView: View {
     
     var body: some View {
         List {
+            // Game Information Section
             Section {
                 LabeledContent("Course", value: game.courseName)
                 LabeledContent("Game Type", value: game.gameType.description)
@@ -37,12 +38,22 @@ struct GameDetailView: View {
                 Text("Game Information")
             }
             
+            // Rounds Section
             Section {
                 ForEach(game.rounds.sorted { $0.date > $1.date }) { round in
-                    Button(action: { selectedRound = round }) {
-                        RoundSummaryRow(round: round)
+                    // For incomplete rounds - direct navigation
+                    if !round.isCompleted {
+                        NavigationLink(destination: LiveScoringView(round: round)) {
+                            RoundSummaryRow(round: round)
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        // For completed rounds - sheet presentation
+                        Button(action: { selectedRound = round }) {
+                            RoundSummaryRow(round: round)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
             } header: {
                 HStack {
@@ -55,26 +66,34 @@ struct GameDetailView: View {
                 }
             }
             
+            // Players Section
             Section {
-                ForEach(game.rounds.sorted { $0.date > $1.date }) { round in
-                    RoundSummaryRow(round: round)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            if round.isCompleted {
-                                selectedRound = round
+                ForEach(game.players.sorted { $0.name < $1.name }) { player in
+                    Button(action: { selectedPlayer = player }) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(player.name)
+                                    .font(.body)
+                                    .foregroundColor(.primary)
+                                
+                                Text("Handicap: \(player.handicapIndex, specifier: "%.1f")")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
                             }
-                            // If not completed, RoundSummaryRow handles navigation internally
+                            
+                            Spacer()
+                            
+                            let totalWinnings = game.totalForPlayer(player)
+                            Text(formatCurrency(totalWinnings))
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(totalWinnings >= 0 ? .green : .red)
                         }
+                    }
+                    .buttonStyle(.plain)
                 }
             } header: {
-                HStack {
-                    Text("Rounds")
-                    Spacer()
-                    Button("Add Round", systemImage: "plus.circle.fill") {
-                        showingNewRound = true
-                    }
-                    .font(.caption)
-                }
+                Text("Players (\(game.players.count))")
             }
         }
         .navigationTitle(game.name)

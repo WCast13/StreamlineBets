@@ -25,6 +25,46 @@ struct RoundDetailView: View {
     var body: some View {
         NavigationStack {
             List {
+                
+                if !round.isCompleted {
+                    Section {
+                        NavigationLink(destination: LiveScoringView(round: round)) {
+                            HStack {
+                                Image(systemName: "play.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Continue Scoring")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                    
+                                    Text("\(round.holesPlayed) holes completed")
+                                        .font(.caption)
+                                        .foregroundColor(.white.opacity(0.8))
+                                }
+                                
+                                Spacer()
+                                
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.white.opacity(0.8))
+                            }
+                            .padding()
+                        }
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Color.orange, Color.orange.opacity(0.8)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                        )
+                    }
+                }
+                
                 // Round Info Section
                 Section("Round Information") {
                     if let game = round.game {
@@ -78,7 +118,7 @@ struct RoundDetailView: View {
                                 HStack {
                                     Label(winner.player?.name ?? "Unknown",
                                           systemImage: "trophy.fill")
-                                        .foregroundColor(.orange)
+                                    .foregroundColor(.orange)
                                     
                                     Spacer()
                                     
