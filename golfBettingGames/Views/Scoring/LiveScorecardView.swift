@@ -54,7 +54,7 @@ struct LiveScorecardView: View {
                     // Hole Numbers Row
                     HStack(spacing: 0) {
                         Text("HOLE")
-                            .frame(width: 80, alignment: .leading)
+                            .frame(width: 60, alignment: .leading)
                             .font(.caption2)
                             .fontWeight(.semibold)
                             .padding(.horizontal, 8)
