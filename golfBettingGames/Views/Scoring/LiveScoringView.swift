@@ -11,12 +11,14 @@ import SwiftData
 struct LiveScoringView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Bindable var round: Round
     
     @State private var currentHole: Int = 1
     @State private var scores: [UUID: Int] = [:]
     @State private var showingRoundComplete = false
     @State private var showingExitConfirmation = false
+    @State private var showingScorecard = true
     
     private var course: Course? { round.game?.course }
     private var totalHoles: Int {
@@ -55,8 +57,42 @@ struct LiveScoringView: View {
         currentHole == totalHoles
     }
     
+    private var isCompact: Bool {
+        horizontalSizeClass == .compact
+    }
+    
     var body: some View {
         NavigationStack {
+            VStack(spacing: 0) {
+                // Top Section - Hole Info
+                
+                HStack {
+                    Button(action: { withAnimation { showingScorecard.toggle() } }) {
+                        Label(
+                            showingScorecard ? "Hide Scorecard" : "Show Scorecard",
+                            systemImage: showingScorecard ? "chevron.up" : "chevron.down"
+                        )
+                        .font(.caption)
+                        .foregroundColor(.accentColor)
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 4)
+                }
+                
+                LiveScorecardView(
+                    round: round,
+                    currentHoleNumber: currentHoleNumber,
+                    scores: $scores
+                )
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+            .background(Color(UIColor.secondarySystemBackground))
+        }
+        
+        // MODIFIED: Main content area with flexible spacing
+        ScrollView {
             VStack(spacing: 0) {
                 // Top Section - Hole Info
                 VStack(spacing: 16) {
@@ -72,12 +108,11 @@ struct LiveScoringView: View {
                         HoleInfoCard(hole: hole)
                     }
                 }
-                .padding()
-                .background(Color(UIColor.secondarySystemBackground))
+                
+                Spacer(minLength: 0)
                 
                 // Scrollable Player Score Entry
-                ScrollView {
-                    VStack(spacing: 16) {
+                    VStack {
                         ForEach(round.scores.sorted(by: {
                             ($0.player?.name ?? "") < ($1.player?.name ?? "")
                         })) { playerScore in
@@ -90,7 +125,7 @@ struct LiveScoringView: View {
                         }
                     }
                     .padding()
-                }
+                
                 
                 // Bottom Navigation
                 VStack(spacing: 12) {
@@ -131,8 +166,6 @@ struct LiveScoringView: View {
                         .disabled(!allScoresEntered)
                     }
                 }
-                .padding()
-                .background(Color(UIColor.secondarySystemBackground))
             }
             .navigationTitle("Live Scoring")
             .navigationBarTitleDisplayMode(.inline)
@@ -144,10 +177,12 @@ struct LiveScoringView: View {
                     .foregroundColor(.red)
                 }
                 
+                // Scorecard toggle in toolbar
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Text("Round \(round.roundNumber)")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    Button(action: { withAnimation { showingScorecard.toggle() } }) {
+                        Image(systemName: showingScorecard ? "table" : "table.fill")
+                            .foregroundColor(.accentColor)
+                    }
                 }
             }
         }
@@ -360,6 +395,7 @@ struct LiveScoringView: View {
 
 // Add this to the bottom of LiveScoringView.swift file
 
+// MARK: - Preview
 #Preview {
     // Create a preview container with mock data
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
@@ -648,3 +684,4 @@ struct LiveScoringView: View {
     }
     .modelContainer(container)
 }
+
