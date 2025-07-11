@@ -12,7 +12,6 @@ import SwiftData
 
 struct CourseListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.dismiss) private var dismiss
     @Query(sort: \Course.name) private var courses: [Course]
     
     @State private var showingAddCourse = false
@@ -38,10 +37,7 @@ struct CourseListView: View {
             }
             .navigationTitle("Courses")
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Done") { dismiss() }
-                }
-                
+                // REMOVED: Done button since we're now in a tab
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Add", systemImage: "plus") {
                         showingAddCourse = true

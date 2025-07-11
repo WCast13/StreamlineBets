@@ -11,7 +11,6 @@ import SwiftData
 
 struct PlayerManagementView: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.dismiss) private var dismiss
     @Query(sort: \Player.name) private var players: [Player]
     
     @State private var showingNewPlayer = false
@@ -47,10 +46,7 @@ struct PlayerManagementView: View {
                 PlayerStatsView(player: player)
             }
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Done") { dismiss() }
-                }
-                
+                // REMOVED: Done button since we're now in a tab
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Add", systemImage: "plus") {
                         showingNewPlayer = true
