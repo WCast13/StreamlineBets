@@ -5,7 +5,6 @@
 //  Created by William Castellano on 7/11/25.
 //
 
-
 import SwiftUI
 import SwiftData
 
@@ -15,10 +14,33 @@ struct PlayerScorecardRow: View {
     @Binding var scores: [UUID: Int]
     let front9Holes: [Hole]
     let back9Holes: [Hole]
+    let showingStrokeInfo: Bool
+    
+    // ADDED: Property to access the game for handicap calculation
+    private var game: Game? {
+        playerScore.round?.game
+    }
+    
+    // ADDED: Calculate course handicap
+    private var courseHandicap: Int {
+        guard let player = playerScore.player, let game = game else { return 0 }
+        return player.courseHandicap(
+            courseRating: game.effectiveRating,
+            slopeRating: Double(game.effectiveSlope),
+            par: game.par
+        )
+    }
+    
+    // ADDED: Function to check if player gets stroke on specific hole
+    private func getsStrokeOnHole(_ holeNumber: Int) -> Bool {
+        let allHoles = front9Holes + back9Holes
+        guard let hole = allHoles.first(where: { $0.number == holeNumber }) else { return false }
+        return courseHandicap >= hole.handicap
+    }
     
     private var playerName: String {
         if let name = playerScore.player?.name {
-            return String(name.prefix(10))
+            return String(name.prefix(8))
         }
         return "Unknown"
     }
@@ -53,12 +75,22 @@ struct PlayerScorecardRow: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            Text(playerName)
-                .frame(width: 80, alignment: .leading)
-                .font(.caption)
-                .fontWeight(.medium)
-                .padding(.horizontal, 8)
-                .lineLimit(1)
+            // CHANGED: Show course handicap when info is toggled
+            HStack(spacing: 2) {
+                Text(playerName)
+                    .frame(width: showingStrokeInfo ? 44 : 60, alignment: .leading)
+                    .font(.system(size: 8, weight: .medium))
+                    .padding(.horizontal, 4)
+                    .lineLimit(1)
+                
+                if showingStrokeInfo {
+                    Text("(\(courseHandicap))")
+                        .frame(width: 16)
+                        .font(.system(size: 7, weight: .medium))
+                        .foregroundColor(.blue)
+                }
+            }
+            .frame(width: 60)
             
             // Front 9 scores
             ForEach(1...9, id: \.self) { holeNum in
@@ -66,32 +98,43 @@ struct PlayerScorecardRow: View {
                     ScoreCell(
                         score: holeScore.grossScore,
                         par: front9Holes.first(where: { $0.number == holeNum })?.par,
-                        isCurrentHole: false
+                        isCurrentHole: false,
+                        hasStroke: getsStrokeOnHole(holeNum) // ADDED: Pass stroke info
                     )
                 } else if holeNum == currentHoleNumber, let currentScore = scores[playerScore.id], currentScore > 0 {
                     ScoreCell(
                         score: currentScore,
                         par: front9Holes.first(where: { $0.number == holeNum })?.par,
-                        isCurrentHole: true
+                        isCurrentHole: true,
+                        hasStroke: getsStrokeOnHole(holeNum) // ADDED: Pass stroke info
                     )
                 } else {
-                    Text("-")
-                        .frame(width: 30)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+                    // ADDED: Empty cell with stroke indicator
+                    ZStack {
+                        Text("-")
+                            .frame(width: 24)
+                            .font(.system(size: 7))
+                            .foregroundColor(.secondary)
+                        
+                        if getsStrokeOnHole(holeNum) {
+                            Circle()
+                                .fill(Color.blue)
+                                .frame(width: 4, height: 4)
+                                .offset(x: 8, y: -6)
+                        }
+                    }
                 }
             }
             
             // Front 9 total
             Text(front9Score > 0 ? "\(front9Score)" : "-")
-                .frame(width: 40)
-                .font(.caption)
-                .fontWeight(.bold)
+                .frame(width: 32)
+                .font(.system(size: 8, weight: .bold))
                 .foregroundColor(.blue)
             
             Divider()
-                .frame(width: 1)
-                .padding(.horizontal, 4)
+                .frame(width: 1, height: 10)
+                .padding(.horizontal, 2)
             
             // Back 9 scores
             ForEach(10...18, id: \.self) { holeNum in
@@ -99,37 +142,48 @@ struct PlayerScorecardRow: View {
                     ScoreCell(
                         score: holeScore.grossScore,
                         par: back9Holes.first(where: { $0.number == holeNum })?.par,
-                        isCurrentHole: false
+                        isCurrentHole: false,
+                        hasStroke: getsStrokeOnHole(holeNum) // ADDED: Pass stroke info
                     )
                 } else if holeNum == currentHoleNumber, let currentScore = scores[playerScore.id], currentScore > 0 {
                     ScoreCell(
                         score: currentScore,
                         par: back9Holes.first(where: { $0.number == holeNum })?.par,
-                        isCurrentHole: true
+                        isCurrentHole: true,
+                        hasStroke: getsStrokeOnHole(holeNum) // ADDED: Pass stroke info
                     )
                 } else {
-                    Text("-")
-                        .frame(width: 30)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+                    // ADDED: Empty cell with stroke indicator
+                    ZStack {
+                        
+                        Text("-")
+                            .frame(width: 24)
+                            .font(.system(size: 7))
+                            .foregroundColor(.secondary)
+                        
+                        if getsStrokeOnHole(holeNum) {
+                            Circle()
+                                .fill(Color.blue)
+                                .frame(width: 3, height: 3)
+                                .offset(x: 8, y: -6)
+                        }
+                    }
                 }
             }
             
             // Back 9 total
             Text(back9Score > 0 ? "\(back9Score)" : "-")
-                .frame(width: 40)
-                .font(.caption)
-                .fontWeight(.bold)
+                .frame(width: 32)
+                .font(.system(size: 8, weight: .bold))
                 .foregroundColor(.blue)
             
             // Total
             Text(totalScore > 0 ? "\(totalScore)" : "-")
-                .frame(width: 40)
-                .font(.caption)
-                .fontWeight(.bold)
+                .frame(width: 32)
+                .font(.system(size: 8, weight: .bold))
                 .foregroundColor(.green)
         }
-        .padding(.vertical, 6)
+        .padding(.vertical, 0)
     }
 }
 
@@ -207,6 +261,8 @@ struct PlayerScorecardRow: View {
     context.insert(player2)
     context.insert(game)
     context.insert(round)
+    context.insert(score1)
+    context.insert(score2)
     
     @State var scores: [UUID: Int] = [
         score1.id: 4,
@@ -214,10 +270,13 @@ struct PlayerScorecardRow: View {
     ]
     
     return VStack {
-        LiveScorecardView(
-            round: round,
+        PlayerScorecardRow(
+            playerScore: score1,
             currentHoleNumber: 8,
-            scores: $scores
+            scores: $scores,
+            front9Holes: course.holes.filter { $0.number <= 9 },
+            back9Holes: course.holes.filter { $0.number > 9 },
+            showingStrokeInfo: false
         )
         .padding()
     }
