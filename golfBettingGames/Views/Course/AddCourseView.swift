@@ -17,9 +17,10 @@ struct AddCourseView: View {
     @State private var city = ""
     @State private var state = ""
     @State private var country = "USA"
-    @State private var tees: [TeeData] = [TeeData()]
+    @State private var tees: [TeeData] = []
+    @State private var newTee = TeeData()
     @State private var holes: [HoleData] = []
-    @State private var useStandardHoles = false
+    @State private var useStandardHoles = true // TODO: - Fix this section to add pars and handicaps
     
     struct TeeData: Identifiable {
         enum Gender {
@@ -60,88 +61,111 @@ struct AddCourseView: View {
                     //                       TextField("Country", text: $country)
                 }
                 
-                ScrollView {
-                    Section("Tees") {
-                        ForEach($tees) { $tee in
-                            VStack(alignment: .leading, spacing: 12) {
-                                Picker("Gender", selection: $tee.selectedGender) {
-                                    Text("Men's").tag(TeeData.Gender.men)
-                                    Text("Women's").tag(TeeData.Gender.women)
-                                }
-                                .pickerStyle(.segmented)
-                                
-                                Picker("Tee", selection: Binding(
-                                    get: { tee.isCustomTee ? "Custom" : tee.name },
-                                    set: { newValue in
-                                        if newValue == "Custom" {
-                                            tee.isCustomTee = true
-                                            tee.name = tee.customTeeName
-                                        } else {
-                                            tee.isCustomTee = false
-                                            tee.name = newValue
-                                        }
-                                    })
-                                ) {
-                                    ForEach(["Black", "Blue", "White", "Gold", "Red", "Green", "Custom"], id: \.self) { option in
-                                        Text(option).tag(option)
-                                    }
-                                }
-                                .pickerStyle(.segmented)
-                                
-                                if tee.isCustomTee {
-                                    TextField("Custom Tee Name", text: $tee.customTeeName)
-                                        .onChange(of: tee.customTeeName) { _, newValue in
-                                            tee.name = newValue
-                                        }
-                                }
-                                
-                                if tee.selectedGender == .men {
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        Text("Men's Ratings")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                        
-                                        HStack {
-                                            TextField("Rating", value: $tee.menRating,
-                                                      format: .number.precision(.fractionLength(1)))
-                                            .keyboardType(.decimalPad)
-                                            .textFieldStyle(.roundedBorder)
-                                            
-                                            Text("/")
-                                            
-                                            TextField("Slope", value: $tee.menSlope, format: .number)
-                                                .keyboardType(.numberPad)
-                                                .textFieldStyle(.roundedBorder)
-                                        }
-                                    }
+                Section("Add Tee") {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Picker("Gender", selection: $newTee.selectedGender) {
+                            Text("Men's").tag(TeeData.Gender.men)
+                            Text("Women's").tag(TeeData.Gender.women)
+                        }
+                        .pickerStyle(.segmented)
+                        
+                        Picker("Tee", selection: Binding(
+                            get: { newTee.isCustomTee ? "Custom" : newTee.name },
+                            set: { newValue in
+                                if newValue == "Custom" {
+                                    newTee.isCustomTee = true
+                                    newTee.name = newTee.customTeeName
                                 } else {
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        Text("Women's Ratings")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                        
-                                        HStack {
-                                            TextField("Rating", value: $tee.womenRating,
-                                                      format: .number.precision(.fractionLength(1)))
-                                            .keyboardType(.decimalPad)
-                                            .textFieldStyle(.roundedBorder)
-                                            
-                                            Text("/")
-                                            
-                                            TextField("Slope", value: $tee.womenSlope, format: .number)
-                                                .keyboardType(.numberPad)
-                                                .textFieldStyle(.roundedBorder)
-                                        }
-                                    }
+                                    newTee.isCustomTee = false
+                                    newTee.name = newValue
+                                }
+                            })
+                        ) {
+                            ForEach(["Black", "Blue", "White", "Gold", "Red", "Green", "Custom"], id: \.self) { option in
+                                Text(option).tag(option)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        
+                        if newTee.isCustomTee {
+                            TextField("Custom Tee Name", text: $newTee.customTeeName)
+                                .onChange(of: newTee.customTeeName) { _, newValue in
+                                    newTee.name = newValue
+                                }
+                        }
+                        
+                        if newTee.selectedGender == .men {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Men's Ratings")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                
+                                HStack {
+                                    TextField("Rating", value: $newTee.menRating,
+                                              format: .number.precision(.fractionLength(1)))
+                                    .keyboardType(.decimalPad)
+                                    .textFieldStyle(.roundedBorder)
+                                    
+                                    Text("/")
+                                    
+                                    TextField("Slope", value: $newTee.menSlope, format: .number)
+                                        .keyboardType(.numberPad)
+                                        .textFieldStyle(.roundedBorder)
                                 }
                             }
-                            .padding(.vertical, 8)
+                        } else {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Women's Ratings")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                
+                                HStack {
+                                    TextField("Rating", value: $newTee.womenRating,
+                                              format: .number.precision(.fractionLength(1)))
+                                    .keyboardType(.decimalPad)
+                                    .textFieldStyle(.roundedBorder)
+                                    
+                                    Text("/")
+                                    
+                                    TextField("Slope", value: $newTee.womenSlope, format: .number)
+                                        .keyboardType(.numberPad)
+                                        .textFieldStyle(.roundedBorder)
+                                }
+                            }
+                        }
+                    }
+                    .padding(.vertical, 8)
+                    
+                    Button("Add Tee") {
+                        tees.append(newTee)
+                        newTee = TeeData()
+                    }
+                    .disabled(newTee.name.isEmpty)
+                }
+                
+                Section("Tees") {
+                    if tees.isEmpty {
+                        Text("No tees added yet.")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(tees) { tee in
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(tee.isCustomTee ? tee.customTeeName : tee.name)
+                                    .font(.headline)
+                                if tee.selectedGender == .men {
+                                    Text("Men: Rating \(String(format: "%.1f", tee.menRating)), Slope \(tee.menSlope)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                } else {
+                                    Text("Women: Rating \(String(format: "%.1f", tee.womenRating)), Slope \(tee.womenSlope)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .padding(.vertical, 6)
                         }
                         .onDelete(perform: deleteTee)
-                        
-                        Button("Add Another Tee") {
-                            tees.append(TeeData())
-                        }
                     }
                 }
                 
@@ -263,4 +287,3 @@ struct AddCourseView: View {
         dismiss()
     }
 }
-
