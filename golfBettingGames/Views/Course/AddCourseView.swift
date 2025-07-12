@@ -44,14 +44,16 @@ struct AddCourseView: View {
     
     var body: some View {
            NavigationStack {
+               
                Form {
                    Section("Course Information") {
                        TextField("Course Name", text: $courseName)
-                       TextField("City", text: $city)
-                       TextField("State", text: $state)
-                       TextField("Country", text: $country)
+//                       TextField("City", text: $city)
+//                       TextField("State", text: $state)
+//                       TextField("Country", text: $country)
                    }
                    
+                   ScrollView {
                    Section("Tees") {
                        ForEach($tees) { $tee in
                            VStack(alignment: .leading, spacing: 12) {
@@ -69,9 +71,9 @@ struct AddCourseView: View {
                                    
                                    HStack {
                                        TextField("Rating", value: $tee.menRating,
-                                                format: .number.precision(.fractionLength(1)))
-                                           .keyboardType(.decimalPad)
-                                           .textFieldStyle(.roundedBorder)
+                                                 format: .number.precision(.fractionLength(1)))
+                                       .keyboardType(.decimalPad)
+                                       .textFieldStyle(.roundedBorder)
                                        
                                        Text("/")
                                        
@@ -88,9 +90,9 @@ struct AddCourseView: View {
                                    
                                    HStack {
                                        TextField("Rating", value: $tee.womenRating,
-                                                format: .number.precision(.fractionLength(1)))
-                                           .keyboardType(.decimalPad)
-                                           .textFieldStyle(.roundedBorder)
+                                                 format: .number.precision(.fractionLength(1)))
+                                       .keyboardType(.decimalPad)
+                                       .textFieldStyle(.roundedBorder)
                                        
                                        Text("/")
                                        
@@ -107,6 +109,7 @@ struct AddCourseView: View {
                        Button("Add Another Tee") {
                            tees.append(TeeData())
                        }
+                   }
                    }
                    
                    Section("Holes") {
@@ -227,4 +230,3 @@ struct AddCourseView: View {
            dismiss()
        }
    }
-   

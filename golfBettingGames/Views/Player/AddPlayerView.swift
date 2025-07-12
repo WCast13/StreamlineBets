@@ -15,6 +15,7 @@ struct AddPlayerView: View {
     
     @State private var playerName = ""
     @State private var handicapIndex = 9.0
+    @State private var handicapIndexText = "9.0"
     
     var body: some View {
         NavigationStack {
@@ -23,17 +24,10 @@ struct AddPlayerView: View {
                     TextField("Player Name", text: $playerName)
                         .textContentType(.name)
                     
-                    HStack {
-                        Text("Handicap Index")
-                        Spacer()
-                        Picker("Handicap Index", selection: $handicapIndex) {
-                            ForEach(Array(stride(from: 0.0, through: 36.0, by: 0.1)), id: \.self) { value in
-                                Text(String(format: "%.1f", value)).tag(value)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(width: 100, height: 100)
-                    }
+                    TextField("Handicap Index", text: $handicapIndexText)
+                        .keyboardType(.decimalPad)
+                        .frame(width: 100)
+                    
                 }
             }
             .navigationTitle("New Player")
@@ -54,10 +48,11 @@ struct AddPlayerView: View {
     }
 
     private func savePlayer() {
-         let player = Player(name: playerName.trimmingCharacters(in: .whitespaces),
-                            handicapIndex: handicapIndex)
-         modelContext.insert(player)
-         try? modelContext.save()
-         dismiss()
-     }
- }
+        let handicapValue = Double(handicapIndexText) ?? 0.0
+        let player = Player(name: playerName.trimmingCharacters(in: .whitespaces),
+                           handicapIndex: handicapValue)
+        modelContext.insert(player)
+        try? modelContext.save()
+        dismiss()
+    }
+}
