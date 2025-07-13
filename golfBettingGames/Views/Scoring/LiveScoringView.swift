@@ -19,6 +19,7 @@ struct LiveScoringView: View {
     @State private var showingRoundComplete = false
     @State private var showingExitConfirmation = false
     @State private var showingScorecard = true
+    @State private var showingGameStatus = true
     
     private var course: Course? { round.game?.course }
     private var totalHoles: Int {
@@ -91,7 +92,13 @@ struct LiveScoringView: View {
             .background(Color(UIColor.secondarySystemBackground))
         }
         
-        // MODIFIED: Main content area with flexible spacing
+        if showingGameStatus {
+            GameStatusView(round: round)
+                .padding(.horizontal)
+                .padding(.bottom, 16)
+                .transition(.move(edge: .top).combined(with: .opacity))
+        }
+        
         ScrollView {
             VStack(spacing: 0) {
                 // Top Section - Hole Info
@@ -112,19 +119,21 @@ struct LiveScoringView: View {
                 Spacer(minLength: 0)
                 
                 // Scrollable Player Score Entry
-                    VStack {
-                        ForEach(round.scores.sorted(by: {
-                            ($0.player?.name ?? "") < ($1.player?.name ?? "")
-                        })) { playerScore in
-                            LiveScoreCard(
-                                playerScore: playerScore,
-                                score: binding(for: playerScore.id),
-                                holeInfo: currentHoleInfo,
-                                courseHandicap: courseHandicap(for: playerScore.player)
-                            )
-                        }
+                VStack {
+                    ForEach(round.scores.sorted(by: {
+                        ($0.player?.name ?? "") < ($1.player?.name ?? "")
+                    })) { playerScore in
+                        LiveScoreCard(
+                            playerScore: playerScore,
+                            score: binding(for: playerScore.id),
+                            holeInfo: currentHoleInfo,
+                            courseHandicap: courseHandicap(for: playerScore.player),
+                            gameType: round.game?.gameType ?? .strokePlay,  // ADDED: Pass game type
+                            allScores: round.scores  // ADDED: Pass all scores for comparison
+                        )
                     }
-                    .padding()
+                }
+                .padding()
                 
                 
                 // Bottom Navigation
@@ -175,6 +184,13 @@ struct LiveScoringView: View {
                         showingExitConfirmation = true
                     }
                     .foregroundColor(.red)
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { withAnimation { showingGameStatus.toggle() } }) {
+                        Image(systemName: showingGameStatus ? "info.circle.fill" : "info.circle")
+                            .foregroundColor(.accentColor)
+                    }
                 }
                 
                 // Scorecard toggle in toolbar
