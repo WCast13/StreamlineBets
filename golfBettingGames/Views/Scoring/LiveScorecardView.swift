@@ -13,6 +13,7 @@ struct LiveScorecardView: View {
     let currentHoleNumber: Int
     @Binding var scores: [UUID: Int]
     @State private var showingStrokeInfo = false
+    @State private var showingMatchPlayDetails = false
     
     private var course: Course? { round.game?.course }
     
@@ -49,6 +50,18 @@ struct LiveScorecardView: View {
                         .foregroundColor(.accentColor)
                 }
                 
+                if round.game?.gameType == .matchPlay {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showingMatchPlayDetails.toggle()
+                        }
+                    } label: {
+                        Image(systemName: showingMatchPlayDetails ? "flag.2.crossed.fill" : "flag.2.crossed")
+                            .font(.system(size: 11))
+                            .foregroundColor(.accentColor)
+                    }
+                }
+                
                 if let courseName = round.game?.courseName {
                     Text(courseName)
                         .font(.system(size: 8))
@@ -64,7 +77,7 @@ struct LiveScorecardView: View {
                 VStack(spacing: 0) {
                     // Hole Numbers Row
                     HStack(spacing: 0) {
-                        Text("HOLE") // CHANGED: Always show "HOLE" since strokes are shown on cells
+                        Text("HOLE")
                             .frame(width: 60, height: 14, alignment: .leading)
                             .font(.system(size: 8, weight: .semibold))
                             .padding(.horizontal, 4)
@@ -187,7 +200,6 @@ struct LiveScorecardView: View {
                         ($0.player?.name ?? "") < ($1.player?.name ?? "")
                     })) { playerScore in
                         Group {
-                            // CHANGED: Removed separate stroke row, now strokes are shown on score cells
                             PlayerScorecardRow(
                                 playerScore: playerScore,
                                 currentHoleNumber: currentHoleNumber,
@@ -202,6 +214,67 @@ struct LiveScorecardView: View {
                                 .opacity(0.5)
                         }
                     }
+                    
+                    // ADDED: Match Play Details Section
+                    if round.game?.gameType == .matchPlay && round.scores.count == 2 {
+                        Divider()
+                            .frame(height: 1)
+                            .background(Color.accentColor)
+                            .padding(.vertical, 2)
+                        
+                        // Match Play Section Header
+                        HStack(spacing: 0) {
+                            Text("MATCH PLAY")
+                                .frame(width: 60, height: 14, alignment: .leading)
+                                .font(.system(size: 8, weight: .bold))
+                                .foregroundColor(.accentColor)
+                                .padding(.horizontal, 4)
+                            
+                            Spacer()
+                            
+                            // Current Match Status
+                            MatchPlayStatus(round: round)
+                                .padding(.horizontal, 8)
+                        }
+                        .padding(.vertical, 4)
+                        .background(Color.accentColor.opacity(0.1))
+                        
+                        VStack(spacing: 0) {
+                            // Player 1 Row
+                            MatchPlayPlayerRow(
+                                playerScore: round.scores[0],
+                                opponentScore: round.scores[1],
+                                playerNumber: 1,
+                                currentHoleNumber: currentHoleNumber,
+                                front9Holes: front9Holes,
+                                back9Holes: back9Holes
+                            )
+                            
+                            Divider()
+                                .frame(height: 0.5)
+                                .opacity(0.5)
+                            
+                            // Player 2 Row
+                            MatchPlayPlayerRow(
+                                playerScore: round.scores[1],
+                                opponentScore: round.scores[0],
+                                playerNumber: 2,
+                                currentHoleNumber: currentHoleNumber,
+                                front9Holes: front9Holes,
+                                back9Holes: back9Holes
+                            )
+                        }
+                        .background(Color.accentColor.opacity(0.05))
+                        
+                        // ADDED: Expandable Match Play Details
+                        if showingMatchPlayDetails {
+                            MatchPlayDetailedView(
+                                round: round,
+                                currentHoleNumber: currentHoleNumber
+                            )
+                            .transition(.opacity.combined(with: .move(edge: .top)))
+                        }
+                    }
                 }
             }
             .font(.system(.body, design: .monospaced))
@@ -212,142 +285,198 @@ struct LiveScorecardView: View {
     }
 }
 
-struct PlayerStrokeRow: View {
+// MARK: - Match Play Components
+
+struct MatchPlayPlayerRow: View {
     let playerScore: PlayerScore
-    let game: Game?
-    let holes: [Hole]
+    let opponentScore: PlayerScore
+    let playerNumber: Int
+    let currentHoleNumber: Int
+    let front9Holes: [Hole]
+    let back9Holes: [Hole]
     
-    private var courseHandicap: Int {
-        guard let player = playerScore.player, let game = game else { return 0 }
-        return player.courseHandicap(
-            courseRating: game.effectiveRating,
-            slopeRating: Double(game.effectiveSlope),
-            par: game.par
-        )
-    }
-    
-    private func getsStrokeOnHole(_ holeNumber: Int) -> Bool {
-        guard let hole = holes.first(where: { $0.number == holeNumber }) else { return false }
-        return courseHandicap >= hole.handicap
+    private var playerName: String {
+        if let name = playerScore.player?.name {
+            return String(name.prefix(8))
+        }
+        return "Player \(playerNumber)"
     }
     
     var body: some View {
         HStack(spacing: 0) {
-            HStack(spacing: 0) {
-                Text("CH: \(courseHandicap)")
-                    .frame(width: 60, alignment: .leading)
-                    .font(.system(size: 7))
-                    .foregroundColor(.blue)
-                    .padding(.horizontal, 4)
-            }
+            Text(playerName)
+                .frame(width: 60, alignment: .leading)
+                .font(.system(size: 8, weight: .medium))
+                .padding(.horizontal, 4)
+                .lineLimit(1)
             
-            // Front 9 stroke indicators
+            // Front 9 match play results
             ForEach(1...9, id: \.self) { holeNum in
-                ZStack {
-                    if getsStrokeOnHole(holeNum) {
-                        Circle()
-                            .fill(Color.blue.opacity(0.2))
-                            .frame(width: 12, height: 12)
-                        Text("•")
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundColor(.blue)
-                    } else {
-                        Text("")
-                    }
-                }
-                .frame(width: 24, height: 14)
+                MatchPlayCellResult(
+                    playerScore: playerScore,
+                    opponentScore: opponentScore,
+                    holeNumber: holeNum,
+                    isCurrentHole: currentHoleNumber == holeNum
+                )
             }
             
-            Text("\(min(courseHandicap, 9))")
+            Text("")
                 .frame(width: 32)
-                .font(.system(size: 7))
-                .foregroundColor(.blue)
             
             Divider()
-                .frame(width: 1, height: 8)
+                .frame(width: 1, height: 10)
                 .padding(.horizontal, 2)
             
-            // Back 9 stroke indicators
+            // Back 9 match play results
             ForEach(10...18, id: \.self) { holeNum in
-                ZStack {
-                    if getsStrokeOnHole(holeNum) {
-                        Circle()
-                            .fill(Color.blue.opacity(0.2))
-                            .frame(width: 12, height: 12)
-                        Text("•")
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundColor(.blue)
-                    } else {
-                        Text("")
-                    }
-                }
-                .frame(width: 24, height: 14)
+                MatchPlayCellResult(
+                    playerScore: playerScore,
+                    opponentScore: opponentScore,
+                    holeNumber: holeNum,
+                    isCurrentHole: currentHoleNumber == holeNum
+                )
             }
             
-            Text("\(max(0, min(courseHandicap - 9, 9)))")
+            Text("")
                 .frame(width: 32)
-                .font(.system(size: 7))
-                .foregroundColor(.blue)
             
-            Text("\(courseHandicap)")
-                .frame(width: 32)
-                .font(.system(size: 7, weight: .medium))
-                .foregroundColor(.blue)
+            // Total match status
+            MatchPlayTotalStatus(
+                playerScore: playerScore,
+                opponentScore: opponentScore
+            )
+            .frame(width: 32)
         }
-        .padding(.vertical, 0)
-        .background(Color.blue.opacity(0.05))
+        .padding(.vertical, 2)
     }
 }
 
-struct CompactScoreCell: View {
-    let score: Int
-    let par: Int?
+struct MatchPlayCellResult: View {
+    let playerScore: PlayerScore
+    let opponentScore: PlayerScore
+    let holeNumber: Int
     let isCurrentHole: Bool
-    let hasStroke: Bool // ADDED: New parameter for stroke indicator
     
-    private var scoreDiff: Int {
-        guard let par = par else { return 0 }
-        return score - par
-    }
-    
-    private var scoreColor: Color {
-        guard let par = par else { return .primary }
-        switch scoreDiff {
-        case ..<(-1): return Color(red: 0.0, green: 0.6, blue: 0.0) // Eagle or better
-        case -1: return .green // Birdie
-        case 0: return .primary // Par
-        case 1: return .orange // Bogey
-        default: return .red // Double bogey or worse
+    private var result: (text: String, color: Color) {
+        // Calculate match status up to this hole
+        var playerWins = 0
+        var opponentWins = 0
+        
+        // Count wins/losses for all holes up to and including this hole
+        for holeNum in 1...holeNumber {
+            if let playerHole = playerScore.holeScores.first(where: { $0.holeNumber == holeNum }),
+               let opponentHole = opponentScore.holeScores.first(where: { $0.holeNumber == holeNum }) {
+                if playerHole.netScore < opponentHole.netScore {
+                    playerWins += 1
+                } else if playerHole.netScore > opponentHole.netScore {
+                    opponentWins += 1
+                }
+            } else {
+                // If we haven't played this hole yet, return empty
+                return ("-", .secondary)
+            }
+        }
+        
+        // Return the match status after this hole
+        if playerWins > opponentWins {
+            return ("\(playerWins - opponentWins)", .green)
+        } else if opponentWins > playerWins {
+            return ("-\(opponentWins - playerWins)", .red)
+        } else {
+            return ("AS", .orange)
         }
     }
     
     var body: some View {
-        ZStack {
-            
-            Text("\(score)")
-                .frame(width: 24, height: 16)
-                .font(.system(size: 8, weight: isCurrentHole ? .bold : .medium))
-                .foregroundColor(scoreColor)
-                .background(
-                    isCurrentHole ?
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Color.accentColor.opacity(0.15))
-                        .padding(.horizontal, 1) : nil
-                )
-            
-            // ADDED: Small dot indicator for strokes
-            if hasStroke {
-                Circle()
-                    .fill(Color.black)
-                    .frame(width: 3, height: 3)
-                    .offset(x: 8, y: -6)
+        Text(result.text)
+            .frame(width: 24, height: 16)
+            .font(.system(size: 8, weight: isCurrentHole ? .bold : .medium))
+            .foregroundColor(result.color)
+            .background(
+                isCurrentHole ?
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.accentColor.opacity(0.15))
+                    .padding(.horizontal, 1) : nil
+            )
+    }
+}
+
+struct MatchPlayTotalStatus: View {
+    let playerScore: PlayerScore
+    let opponentScore: PlayerScore
+    
+    private var totalStatus: (text: String, color: Color) {
+        var wins = 0
+        var losses = 0
+        
+        for hole in playerScore.holeScores {
+            if let opponentHole = opponentScore.holeScores.first(where: { $0.holeNumber == hole.holeNumber }) {
+                if hole.netScore < opponentHole.netScore {
+                    wins += 1
+                } else if hole.netScore > opponentHole.netScore {
+                    losses += 1
+                }
             }
         }
+        
+        if wins > losses {
+            return ("+\(wins - losses)", .green)
+        } else if losses > wins {
+            return ("-\(losses - wins)", .red)
+        } else {
+            return ("AS", .orange)
+        }
+    }
+    
+    var body: some View {
+        Text(totalStatus.text)
+            .font(.system(size: 8, weight: .bold))
+            .foregroundColor(totalStatus.color)
+    }
+}
+
+struct MatchPlayLegend: View {
+    var body: some View {
+        HStack(spacing: 16) {
+            HStack(spacing: 4) {
+                Text("2")
+                    .font(.system(size: 8, weight: .medium))
+                    .foregroundColor(.green)
+                    .frame(width: 16)
+                Text("= 2 up")
+                    .font(.system(size: 7))
+                    .foregroundColor(.secondary)
+            }
+            
+            HStack(spacing: 4) {
+                Text("-1")
+                    .font(.system(size: 8, weight: .medium))
+                    .foregroundColor(.red)
+                    .frame(width: 16)
+                Text("= 1 down")
+                    .font(.system(size: 7))
+                    .foregroundColor(.secondary)
+            }
+            
+            HStack(spacing: 4) {
+                Text("AS")
+                    .font(.system(size: 8, weight: .medium))
+                    .foregroundColor(.orange)
+                    .frame(width: 16)
+                Text("= All Square")
+                    .font(.system(size: 7))
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(4)
     }
 }
 
 // MARK: - Preview
-#Preview {
+#Preview("Match Play Scorecard") {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(
         for: Player.self, Course.self, Tee.self, Hole.self, Game.self, Round.self, PlayerScore.self, HoleScore.self,
@@ -357,14 +486,14 @@ struct CompactScoreCell: View {
     let context = container.mainContext
     
     // Create course
-    let course = Course(name: "Pebble Beach", par: 72)
+    let course = Course(name: "Augusta National", par: 72)
     
-    // Create 18 holes
+    // Create holes with handicaps
     let holeData: [(par: Int, handicap: Int)] = [
-        (4, 7), (5, 13), (4, 15), (4, 9), (3, 17),
-        (5, 1), (3, 11), (4, 3), (4, 5),
-        (4, 8), (4, 10), (3, 16), (4, 2), (5, 6),
-        (4, 12), (4, 14), (3, 18), (5, 4)
+        (4, 10), (5, 4), (4, 2), (3, 16), (4, 14),
+        (3, 8), (4, 18), (5, 6), (4, 12),
+        (4, 5), (4, 1), (3, 9), (5, 13), (4, 17),
+        (5, 7), (3, 11), (4, 15), (4, 3)
     ]
     
     for (index, data) in holeData.enumerated() {
@@ -378,24 +507,23 @@ struct CompactScoreCell: View {
         course.holes.append(hole)
     }
     
-    // Create players and game
-    let player1 = Player(name: "Tiger Woods", handicapIndex: 0.0)
-    let player2 = Player(name: "Average Golfer", handicapIndex: 18.0)
-    let player3 = Player(name: "High Handicapper", handicapIndex: 24.0)
+    // Create match play game
+    let player1 = Player(name: "Tiger Woods", handicapIndex: 2.5)
+    let player2 = Player(name: "Phil Mickelson", handicapIndex: 5.3)
     
     let game = Game(
-        name: "Test Game",
-        gameType: .strokePlay,
+        name: "Match Play Championship",
+        gameType: .matchPlay,
         courseName: course.name,
         courseRating: 72.0,
-        slopeRating: 130.0,
+        slopeRating: 135.0,
         par: 72
     )
     game.course = course
     
     let round = Round(
         roundNumber: 1,
-        betAmount: 50.0,
+        betAmount: 100.0,
         roundType: .full18
     )
     round.game = game
@@ -403,46 +531,54 @@ struct CompactScoreCell: View {
     // Create scores
     let score1 = PlayerScore(player: player1)
     let score2 = PlayerScore(player: player2)
-    let score3 = PlayerScore(player: player3)
     
-    // Add some hole scores with varying performance
-    for i in 1...7 {
-        let hs1 = HoleScore(holeNumber: i, grossScore: i == 2 ? 3 : (i == 6 ? 6 : 4))
+    // Simulate 10 holes played with match play results
+    let holeResults = [
+        (1, 4, 5),  // Tiger wins
+        (2, 5, 5),  // Halved
+        (3, 4, 4),  // Halved
+        (4, 2, 3),  // Tiger wins
+        (5, 4, 5),  // Tiger wins
+        (6, 3, 3),  // Halved
+        (7, 5, 4),  // Phil wins
+        (8, 4, 6),  // Tiger wins
+        (9, 4, 4),  // Halved
+        (10, 5, 4), // Phil wins
+    ]
+    
+    for (hole, tigerScore, philScore) in holeResults {
+        let hs1 = HoleScore(holeNumber: hole, grossScore: tigerScore)
         hs1.playerScore = score1
+        hs1.hole = course.holes.first(where: { $0.number == hole })
         score1.holeScores.append(hs1)
         
-        let hs2 = HoleScore(holeNumber: i, grossScore: i == 5 ? 2 : 5)
+        let hs2 = HoleScore(holeNumber: hole, grossScore: philScore)
         hs2.playerScore = score2
+        hs2.hole = course.holes.first(where: { $0.number == hole })
         score2.holeScores.append(hs2)
-        
-        let hs3 = HoleScore(holeNumber: i, grossScore: i == 3 ? 8 : 6)
-        hs3.playerScore = score3
-        score3.holeScores.append(hs3)
     }
     
-    round.scores = [score1, score2, score3]
+    round.scores = [score1, score2]
     
     context.insert(course)
     context.insert(player1)
     context.insert(player2)
-    context.insert(player3)
     context.insert(game)
     context.insert(round)
     
     @State var scores: [UUID: Int] = [
         score1.id: 4,
-        score2.id: 6,
-        score3.id: 7
+        score2.id: 3
     ]
     
     return VStack {
-        Text("Ultra Compact Scorecard")
+        Text("Match Play Scorecard")
             .font(.headline)
             .padding(.top)
         
         LiveScorecardView(
             round: round,
-            currentHoleNumber: 8,
+            currentHoleNumber: 11,
             scores: $scores
         )
         .padding()

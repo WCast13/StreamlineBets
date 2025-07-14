@@ -92,18 +92,12 @@ struct LiveScoringView: View {
             .background(Color(UIColor.secondarySystemBackground))
         }
         
-        if showingGameStatus {
-            GameStatusView(round: round)
-                .padding(.horizontal)
-                .padding(.bottom, 16)
-                .transition(.move(edge: .top).combined(with: .opacity))
-        }
-        
         ScrollView {
             VStack(spacing: 0) {
                 // Top Section - Hole Info
                 VStack(spacing: 16) {
                     // Hole Progress Indicator
+                    // TODO: - Make this more compact
                     HoleProgressView(
                         currentHole: currentHole,
                         totalHoles: totalHoles,
