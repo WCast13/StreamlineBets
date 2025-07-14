@@ -379,9 +379,9 @@ struct MatchPlayCellResult: View {
         
         // Return the match status after this hole
         if playerWins > opponentWins {
-            return ("\(playerWins - opponentWins)", .green)
+            return ("\(playerWins - opponentWins) Up", .green)
         } else if opponentWins > playerWins {
-            return ("-\(opponentWins - playerWins)", .red)
+            return ("", .red)
         } else {
             return ("AS", .orange)
         }
@@ -535,11 +535,11 @@ struct MatchPlayLegend: View {
     // Simulate 10 holes played with match play results
     let holeResults = [
         (1, 4, 5),  // Tiger wins
-        (2, 5, 5),  // Halved
-        (3, 4, 4),  // Halved
+        (2, 4, 4),  // Halved
+        (3, 4, 3),  // Halved
         (4, 2, 3),  // Tiger wins
         (5, 4, 5),  // Tiger wins
-        (6, 3, 3),  // Halved
+        (6, 2, 3),  // Halved
         (7, 5, 4),  // Phil wins
         (8, 4, 6),  // Tiger wins
         (9, 4, 4),  // Halved
