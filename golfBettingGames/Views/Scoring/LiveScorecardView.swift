@@ -321,25 +321,8 @@ struct CompactScoreCell: View {
         }
     }
     
-//    private var scoreSymbol: String? {
-//        guard let par = par else { return nil }
-//        switch scoreDiff {
-//        case ..<(-1): return "◎" // Eagle (double circle)
-//        case -1: return "○" // Birdie (circle)
-//        case 0: return nil // Par (no symbol)
-//        case 1: return "□" // Bogey (square)
-//        case 2: return "■" // Double bogey (filled square)
-//        default: return nil
-//        }
-//    }
-    
     var body: some View {
         ZStack {
-//            if let symbol = scoreSymbol {
-//                Text(symbol)
-//                    .font(.system(size: 12))
-//                    .foregroundColor(scoreColor.opacity(0.2))
-//            }
             
             Text("\(score)")
                 .frame(width: 24, height: 16)
