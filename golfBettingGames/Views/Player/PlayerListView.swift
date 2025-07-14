@@ -29,7 +29,14 @@ struct PlayerListView: View {
             } else {
                 ForEach(players) { player in
                     NavigationLink(value: player) {
-                        PlayerRow(player: player)
+                        PlayerRowView(
+                            player: player,
+                            showHandicap: true,
+                            showCourseHandicap: false,
+                            showWinnings: false,
+                            showRemoveButton: false,
+                            showChevron: true
+                        )
                     }
                     .swipeActions(edge: .trailing) {
                         Button("Edit") {

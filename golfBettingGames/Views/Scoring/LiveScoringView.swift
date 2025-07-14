@@ -21,6 +21,15 @@ struct LiveScoringView: View {
     @State private var showingScorecard = true
     @State private var showingGameStatus = true
     
+    // NEW: Add scorecard view model
+    @State private var scorecardViewModel: ScorecardViewModel
+    
+    // NEW: Initialize with round
+    init(round: Round) {
+        self.round = round
+        self._scorecardViewModel = State(wrappedValue: ScorecardViewModel(round: round))
+    }
+    
     private var course: Course? { round.game?.course }
     private var totalHoles: Int {
         switch round.roundType {
@@ -65,108 +74,139 @@ struct LiveScoringView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Top Section - Hole Info
-                
-                HStack {
-                    Button(action: { withAnimation { showingScorecard.toggle() } }) {
-                        Label(
-                            showingScorecard ? "Hide Scorecard" : "Show Scorecard",
-                            systemImage: showingScorecard ? "chevron.up" : "chevron.down"
-                        )
-                        .font(.caption)
-                        .foregroundColor(.accentColor)
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 4)
-                }
-                
-                LiveScorecardView(
-                    round: round,
-                    currentHoleNumber: currentHoleNumber,
-                    scores: $scores
-                )
-                .padding(.horizontal)
-                .padding(.bottom, 8)
-                .transition(.move(edge: .top).combined(with: .opacity))
-            }
-            .background(Color(UIColor.secondarySystemBackground))
-        }
-        
-        ScrollView {
-            VStack(spacing: 0) {
-                // Top Section - Hole Info
-                VStack(spacing: 16) {
-                    // Hole Progress Indicator
-                    // TODO: - Make this more compact
-                    HoleProgressView(
-                        currentHole: currentHole,
-                        totalHoles: totalHoles,
-                        holeNumber: currentHoleNumber
-                    )
-                    
-                    // Hole Details
-                    if let hole = currentHoleInfo {
-                        HoleInfoCard(hole: hole)
-                    }
-                }
-                
-                Spacer(minLength: 0)
-                
-                // Scrollable Player Score Entry
-                VStack {
-                    ForEach(round.scores.sorted(by: {
-                        ($0.player?.name ?? "") < ($1.player?.name ?? "")
-                    })) { playerScore in
-                        LiveScoreCard(
-                            playerScore: playerScore,
-                            score: binding(for: playerScore.id),
-                            holeInfo: currentHoleInfo,
-                            courseHandicap: courseHandicap(for: playerScore.player),
-                            gameType: round.game?.gameType ?? .strokePlay,  // ADDED: Pass game type
-                            allScores: round.scores  // ADDED: Pass all scores for comparison
-                        )
-                    }
-                }
-                .padding()
-                
-                
-                // Bottom Navigation
-                VStack(spacing: 12) {
-                    // Quick Score Buttons for Common Scores
-                    if allScoresEntered {
+                // UPDATED: New scorecard implementation
+                if showingScorecard {
+                    VStack(spacing: 0) {
+                        // Scorecard toggle button
                         HStack {
-                            Text("All scores entered")
+                            Button(action: { withAnimation { showingScorecard.toggle() } }) {
+                                Label(
+                                    showingScorecard ? "Hide Scorecard" : "Show Scorecard",
+                                    systemImage: showingScorecard ? "chevron.up" : "chevron.down"
+                                )
                                 .font(.caption)
-                                .foregroundColor(.green)
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                                .imageScale(.small)
-                        }
-                        .padding(.top, 8)
-                    }
-                    
-                    HStack(spacing: 16) {
-                        // Previous Hole
-                        Button(action: previousHole) {
-                            HStack {
-                                Image(systemName: "chevron.left")
-                                Text("Previous")
+                                .foregroundColor(.accentColor)
                             }
-                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal)
+                            .padding(.vertical, 4)
+                            
+                            Spacer()
                         }
-                        .buttonStyle(.bordered)
-                        .disabled(currentHole == 1)
+                        .background(Color(UIColor.secondarySystemBackground))
                         
-                        // Next Hole or Finish
-                        Button(action: nextHoleOrFinish) {
-                            HStack {
-                                Text(isLastHole ? "Finish Round" : "Next Hole")
-                                Image(systemName: isLastHole ? "checkmark.circle.fill" : "chevron.right")
+                        // New scorecard components
+                        VStack(spacing: 0) {
+                            ScorecardHeader(
+                                viewModel: scorecardViewModel,
+                                isCompact: isCompact
+                            )
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                ScorecardGrid(
+                                    viewModel: scorecardViewModel,
+                                    currentHoleNumber: currentHoleNumber,
+                                    scores: $scores,
+                                    isEditable: false, // Set to false since we have dedicated score entry UI below
+                                    onScoreTap: nil
+                                )
                             }
-                            .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(!allScoresEntered)
+                        .background(Color(UIColor.systemBackground))
+                        .cornerRadius(6)
+                        .shadow(color: Color.black.opacity(0.05), radius: 1, x: 0, y: 1)
+                        .padding(.horizontal)
+                        .padding(.bottom, 8)
+                    }
+                    .background(Color(UIColor.secondarySystemBackground))
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
+                
+                // Main scoring content
+                ScrollView {
+                    VStack(spacing: 0) {
+                        // Top Section - Hole Info
+                        VStack(spacing: 16) {
+                            // Hole Progress Indicator
+                            HoleProgressView(
+                                currentHole: currentHole,
+                                totalHoles: totalHoles,
+                                holeNumber: currentHoleNumber
+                            )
+                            
+                            // Hole Details
+                            if let hole = currentHoleInfo {
+                                HoleInfoCard(hole: hole)
+                            }
+                        }
+                        .padding()
+                        
+                        // Game Status (if enabled)
+                        if showingGameStatus, let gameType = round.game?.gameType {
+                            GameStatusView(round: round)
+                                .padding(.horizontal)
+                                .padding(.bottom)
+                                .transition(.opacity)
+                        }
+                        
+                        Spacer(minLength: 0)
+                        
+                        // Scrollable Player Score Entry
+                        VStack(spacing: 16) {
+                            ForEach(round.scores.sorted(by: {
+                                ($0.player?.name ?? "") < ($1.player?.name ?? "")
+                            })) { playerScore in
+                                LiveScoreCard(
+                                    playerScore: playerScore,
+                                    score: binding(for: playerScore.id),
+                                    holeInfo: currentHoleInfo,
+                                    courseHandicap: courseHandicap(for: playerScore.player),
+                                    gameType: round.game?.gameType ?? .strokePlay,
+                                    allScores: round.scores
+                                )
+                            }
+                        }
+                        .padding()
+                        
+                        // Bottom Navigation
+                        VStack(spacing: 12) {
+                            // Quick Score Buttons for Common Scores
+                            if allScoresEntered {
+                                HStack {
+                                    Text("All scores entered")
+                                        .font(.caption)
+                                        .foregroundColor(.green)
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                        .imageScale(.small)
+                                }
+                                .padding(.top, 8)
+                            }
+                            
+                            HStack(spacing: 16) {
+                                // Previous Hole
+                                Button(action: previousHole) {
+                                    HStack {
+                                        Image(systemName: "chevron.left")
+                                        Text("Previous")
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.bordered)
+                                .disabled(currentHole == 1)
+                                
+                                // Next Hole or Finish
+                                Button(action: nextHoleOrFinish) {
+                                    HStack {
+                                        Text(isLastHole ? "Finish Round" : "Next Hole")
+                                        Image(systemName: isLastHole ? "checkmark.circle.fill" : "chevron.right")
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .disabled(!allScoresEntered)
+                            }
+                        }
+                        .padding()
                     }
                 }
             }
@@ -328,370 +368,21 @@ struct LiveScoringView: View {
         
         switch game.gameType {
         case .skins:
-            calculateSkinsWinnings()  // ✅ Uses your existing method
+            GameScoringCalculator.calculateSkinsWinnings(for: round)
         case .nassau:
-            GameScoringCalculator.calculateNassauWinnings(for: round)  // ✅ Now supported
+            GameScoringCalculator.calculateNassauWinnings(for: round)
         case .matchPlay:
-            GameScoringCalculator.calculateMatchPlayWinnings(for: round)  // ✅ Now supported
+            GameScoringCalculator.calculateMatchPlayWinnings(for: round)
         case .wolf:
-            GameScoringCalculator.calculateWolfWinnings(for: round)  // ✅ Now supported
+            GameScoringCalculator.calculateWolfWinnings(for: round)
         case .bestBall:
-            GameScoringCalculator.calculateBestBallWinnings(for: round)  // ✅ Now supported
+            GameScoringCalculator.calculateBestBallWinnings(for: round)
         case .strokePlay:
-            GameScoringCalculator.calculateStrokePlayWinnings(for: round)  // ✅ Now supported
+            GameScoringCalculator.calculateStrokePlayWinnings(for: round)
         case .scramble:
-            GameScoringCalculator.calculateStrokePlayWinnings(for: round)  // ✅ Now supported
+            GameScoringCalculator.calculateScrambleWinnings(for: round)
         case .custom:
-            GameScoringCalculator.calculateStrokePlayWinnings(for: round)  // ✅ Now supported
-        }
-    }
-    
-    private func calculateSkinsWinnings() {
-        // For hole-by-hole skins
-        if round.roundType == .hole {
-            let scores = round.scores
-            guard !scores.isEmpty else { return }
-            
-            let lowestNetScore = scores.map { $0.netScore }.min() ?? 0
-            let winners = scores.filter { $0.netScore == lowestNetScore }
-            
-            if winners.count == 1 {
-                let totalPot = round.betAmount * Double(scores.count)
-                for score in scores {
-                    if score.netScore == lowestNetScore {
-                        score.winnings = totalPot - round.betAmount
-                    } else {
-                        score.winnings = -round.betAmount
-                    }
-                }
-            } else {
-                // Tie - no money changes hands
-                for score in scores {
-                    score.winnings = 0
-                }
-            }
-        } else {
-            // Multi-hole skins - calculate per hole
-            // This would be more complex, calculating skins for each hole
-            calculateStrokePlayWinnings()
-        }
-    }
-    
-    private func calculateNassauWinnings() {
-        // Nassau: Front 9, Back 9, and Total
-        // Simplified for now
-        calculateStrokePlayWinnings()
-    }
-    
-    private func calculateMatchPlayWinnings() {
-        // Match play hole by hole
-        calculateStrokePlayWinnings()
-    }
-    
-    private func calculateStrokePlayWinnings() {
-        let scores = round.scores.sorted { $0.netScore < $1.netScore }
-        guard scores.count >= 2 else { return }
-        
-        let winner = scores[0]
-        let totalPot = round.betAmount * Double(scores.count)
-        
-        // Winner takes all
-        winner.winnings = totalPot - round.betAmount
-        for score in scores.dropFirst() {
-            score.winnings = -round.betAmount
+            GameScoringCalculator.calculateStrokePlayWinnings(for: round)
         }
     }
 }
-
-// Add this to the bottom of LiveScoringView.swift file
-
-// MARK: - Preview
-#Preview {
-    // Create a preview container with mock data
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(
-        for: Player.self, Course.self, Tee.self, Hole.self, Game.self, Round.self, PlayerScore.self, HoleScore.self,
-        configurations: config
-    )
-    
-    let context = container.mainContext
-    
-    // Create mock course
-    let course = Course(name: "Pebble Beach Golf Links", par: 72, city: "Pebble Beach", state: "CA")
-    
-    // Create tees
-    let whiteTees = Tee(
-        name: "White",
-        menRating: 71.7,
-        menSlope: 133,
-        womenRating: 74.0,
-        womenSlope: 140
-    )
-    whiteTees.course = course
-    course.tees.append(whiteTees)
-    
-    // Create holes with realistic data
-    let holeData: [(par: Int, handicap: Int, distance: Int)] = [
-        (4, 7, 380),   // Hole 1
-        (5, 13, 502),  // Hole 2
-        (4, 15, 388),  // Hole 3
-        (4, 9, 327),   // Hole 4
-        (3, 17, 166),  // Hole 5
-        (5, 1, 513),   // Hole 6
-        (3, 11, 106),  // Hole 7
-        (4, 3, 418),   // Hole 8
-        (4, 5, 450),   // Hole 9
-        (4, 8, 426),   // Hole 10
-        (4, 10, 373),  // Hole 11
-        (3, 16, 188),  // Hole 12
-        (4, 2, 392),   // Hole 13
-        (5, 6, 565),   // Hole 14
-        (4, 12, 365),  // Hole 15
-        (4, 14, 332),  // Hole 16
-        (3, 18, 172),  // Hole 17
-        (5, 4, 542)    // Hole 18
-    ]
-    
-    for (index, data) in holeData.enumerated() {
-        let hole = Hole(
-            number: index + 1,
-            par: data.par,
-            handicap: data.handicap,
-            distance: data.distance
-        )
-        hole.course = course
-        course.holes.append(hole)
-        context.insert(hole)
-    }
-    
-    // Create players
-    let player1 = Player(name: "Tiger Woods", handicapIndex: 2.5)
-    let player2 = Player(name: "Phil Mickelson", handicapIndex: 5.3)
-    let player3 = Player(name: "Rory McIlroy", handicapIndex: 0.8)
-    
-    // Create game
-    let game = Game(
-        name: "Sunday Skins",
-        gameType: .skins,
-        courseName: course.name,
-        courseRating: whiteTees.menRating,
-        slopeRating: Double(whiteTees.menSlope),
-        par: course.par
-    )
-    game.course = course
-    game.selectedTee = whiteTees
-    game.selectedGender = .men
-    game.players = [player1, player2, player3]
-    
-    // Create round
-    let round = Round(
-        roundNumber: 1,
-        betAmount: 50.0,
-        roundType: .full18,
-        startingHole: 1
-    )
-    round.game = game
-    
-    // Create player scores
-    let score1 = PlayerScore(player: player1)
-    score1.round = round
-    
-    let score2 = PlayerScore(player: player2)
-    score2.round = round
-    
-    let score3 = PlayerScore(player: player3)
-    score3.round = round
-    
-    // Add some existing hole scores to show progress
-    // Simulate first 3 holes already scored
-    for holeNum in 1...3 {
-        let hole = course.holes.first(where: { $0.number == holeNum })
-        
-        let holeScore1 = HoleScore(holeNumber: holeNum, grossScore: 4)
-        holeScore1.playerScore = score1
-        holeScore1.hole = hole
-        score1.holeScores.append(holeScore1)
-        
-        let holeScore2 = HoleScore(holeNumber: holeNum, grossScore: 5)
-        holeScore2.playerScore = score2
-        holeScore2.hole = hole
-        score2.holeScores.append(holeScore2)
-        
-        let holeScore3 = HoleScore(holeNumber: holeNum, grossScore: 3)
-        holeScore3.playerScore = score3
-        holeScore3.hole = hole
-        score3.holeScores.append(holeScore3)
-    }
-    
-    round.scores = [score1, score2, score3]
-    round.holesPlayed = 3
-    
-    // Insert all objects
-    context.insert(course)
-    context.insert(whiteTees)
-    context.insert(player1)
-    context.insert(player2)
-    context.insert(player3)
-    context.insert(game)
-    context.insert(round)
-    context.insert(score1)
-    context.insert(score2)
-    context.insert(score3)
-    
-    // Save context
-    try! context.save()
-    
-    return NavigationStack {
-        LiveScoringView(round: round)
-    }
-    .modelContainer(container)
-}
-
-// Additional preview showing hole-by-hole scoring
-#Preview("Single Hole") {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(
-        for: Player.self, Course.self, Tee.self, Hole.self, Game.self, Round.self, PlayerScore.self, HoleScore.self,
-        configurations: config
-    )
-    
-    let context = container.mainContext
-    
-    // Create simple course
-    let course = Course(name: "Local Golf Club", par: 72)
-    
-    // Create single hole
-    let hole = Hole(number: 7, par: 3, handicap: 15, distance: 165)
-    hole.course = course
-    course.holes.append(hole)
-    
-    // Create players
-    let player1 = Player(name: "John Smith", handicapIndex: 12.5)
-    let player2 = Player(name: "Mike Johnson", handicapIndex: 18.2)
-    
-    // Create game
-    let game = Game(
-        name: "Hole 7 Skins",
-        gameType: .skins,
-        courseName: course.name,
-        courseRating: 72.0,
-        slopeRating: 113.0,
-        par: 72
-    )
-    game.course = course
-    game.players = [player1, player2]
-    
-    // Create single hole round
-    let round = Round(
-        roundNumber: 5,
-        holeNumber: 7,
-        betAmount: 20.0,
-        roundType: .hole
-    )
-    round.game = game
-    
-    // Create player scores
-    let score1 = PlayerScore(player: player1)
-    score1.round = round
-    
-    let score2 = PlayerScore(player: player2)
-    score2.round = round
-    
-    round.scores = [score1, score2]
-    
-    // Insert all
-    context.insert(course)
-    context.insert(hole)
-    context.insert(player1)
-    context.insert(player2)
-    context.insert(game)
-    context.insert(round)
-    context.insert(score1)
-    context.insert(score2)
-    
-    try! context.save()
-    
-    return NavigationStack {
-        LiveScoringView(round: round)
-    }
-    .modelContainer(container)
-}
-
-// Preview showing back 9 scoring
-#Preview("Back 9") {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(
-        for: Player.self, Course.self, Tee.self, Hole.self, Game.self, Round.self, PlayerScore.self, HoleScore.self,
-        configurations: config
-    )
-    
-    let context = container.mainContext
-    
-    // Create course with back 9 holes
-    let course = Course(name: "Country Club", par: 72)
-    
-    // Create back 9 holes
-    for holeNum in 10...18 {
-        let par = holeNum == 12 || holeNum == 17 ? 3 : (holeNum == 14 || holeNum == 18 ? 5 : 4)
-        let hole = Hole(
-            number: holeNum,
-            par: par,
-            handicap: (holeNum - 9) * 2,
-            distance: par == 3 ? 180 : (par == 5 ? 520 : 400)
-        )
-        hole.course = course
-        course.holes.append(hole)
-        context.insert(hole)
-    }
-    
-    // Create players
-    let player1 = Player(name: "Player One", handicapIndex: 8.5)
-    let player2 = Player(name: "Player Two", handicapIndex: 15.0)
-    
-    // Create game
-    let game = Game(
-        name: "Back 9 Nassau",
-        gameType: .nassau,
-        courseName: course.name,
-        courseRating: 72.0,
-        slopeRating: 128.0,
-        par: 72
-    )
-    game.course = course
-    game.players = [player1, player2]
-    
-    // Create back 9 round
-    let round = Round(
-        roundNumber: 2,
-        betAmount: 30.0,
-        roundType: .back9,
-        startingHole: 10
-    )
-    round.game = game
-    
-    // Create player scores
-    let score1 = PlayerScore(player: player1)
-    score1.round = round
-    
-    let score2 = PlayerScore(player: player2)
-    score2.round = round
-    
-    round.scores = [score1, score2]
-    
-    // Insert all
-    context.insert(course)
-    context.insert(player1)
-    context.insert(player2)
-    context.insert(game)
-    context.insert(round)
-    context.insert(score1)
-    context.insert(score2)
-    
-    try! context.save()
-    
-    return NavigationStack {
-        LiveScoringView(round: round)
-    }
-    .modelContainer(container)
-}
-
