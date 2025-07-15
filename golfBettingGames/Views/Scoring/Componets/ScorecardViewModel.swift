@@ -504,13 +504,13 @@ struct MatchPlayDetailsSection: View {
                 .background(Color.accentColor.opacity(0.05))
                 
                 // Expandable Match Play Details
-                if viewModel.showingMatchPlayDetails {
-                    MatchPlayDetailedView(
-                        round: viewModel.round,
-                        currentHoleNumber: currentHoleNumber ?? 1
-                    )
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                }
+//                if viewModel.showingMatchPlayDetails {
+//                    MatchPlayDetailedView(
+//                        round: viewModel.round,
+//                        currentHoleNumber: currentHoleNumber ?? 1
+//                    )
+//                    .transition(.opacity.combined(with: .move(edge: .top)))
+//                }
             }
         }
     }

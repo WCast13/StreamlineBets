@@ -212,13 +212,6 @@ struct LiveScoringView: View {
                     .foregroundColor(.red)
                 }
                 
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//                    Button(action: { withAnimation { showingGameStatus.toggle() } }) {
-//                        Image(systemName: showingGameStatus ? "info.circle.fill" : "info.circle")
-//                            .foregroundColor(.accentColor)
-//                    }
-//                }
-                
                 // Scorecard toggle in toolbar
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { withAnimation { showingScorecard.toggle() } }) {
