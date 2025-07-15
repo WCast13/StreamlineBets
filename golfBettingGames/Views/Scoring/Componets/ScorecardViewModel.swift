@@ -350,11 +350,17 @@ struct ScorecardPlayerRow: View {
         playerScore.player?.name ?? "Unknown"
     }
     
+    private var playerInitials: String {
+        guard let name = playerScore.player?.name, !name.isEmpty else { return "?" }
+        let words = name.split(separator: " ")
+        return words.compactMap { $0.first }.map { String($0).uppercased() }.joined()
+    }
+    
     var body: some View {
         HStack(spacing: 0) {
             // Player name
             HStack(spacing: 2) {
-                Text(playerName.prefix(8))
+                Text(playerInitials)
                     .frame(width: viewModel.showingStrokeInfo ? 44 : 60, alignment: .leading)
                     .font(.system(size: 10, weight: .medium))
                     .padding(.horizontal, 4)

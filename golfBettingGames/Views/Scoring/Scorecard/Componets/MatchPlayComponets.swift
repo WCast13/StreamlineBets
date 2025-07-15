@@ -82,9 +82,9 @@ struct MatchPlayPlayerRow: View {
                 .padding(.horizontal, 4)
                 .lineLimit(1)
             
-            // Front 9 match play results
+            // Front 9 match play status per hole
             ForEach(1...9, id: \.self) { holeNum in
-                MatchPlayCellResult(
+                MatchPlayCellStatus(
                     playerScore: playerScore,
                     opponentScore: opponentScore,
                     holeNumber: holeNum,
@@ -99,9 +99,9 @@ struct MatchPlayPlayerRow: View {
                 .frame(width: 1, height: 10)
                 .padding(.horizontal, 2)
             
-            // Back 9 match play results
+            // Back 9 match play status per hole
             ForEach(10...18, id: \.self) { holeNum in
-                MatchPlayCellResult(
+                MatchPlayCellStatus(
                     playerScore: playerScore,
                     opponentScore: opponentScore,
                     holeNumber: holeNum,
@@ -152,6 +152,49 @@ struct MatchPlayCellResult: View {
             .frame(width: 28)
             .font(.system(size: 8, weight: isCurrentHole ? .bold : .medium))
             .foregroundColor(result.color)
+            .background(
+                isCurrentHole ?
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.accentColor.opacity(0.15))
+                    .padding(.horizontal, 1) : nil
+            )
+    }
+}
+
+// MARK: - MatchPlayCellStatus (new)
+struct MatchPlayCellStatus: View {
+    let playerScore: PlayerScore
+    let opponentScore: PlayerScore
+    let holeNumber: Int
+    let isCurrentHole: Bool
+
+    private var matchStatus: (text: String, color: Color) {
+        var wins = 0
+        var losses = 0
+        for h in 1...holeNumber {
+            if let playerHole = playerScore.holeScores.first(where: { $0.holeNumber == h }),
+               let opponentHole = opponentScore.holeScores.first(where: { $0.holeNumber == h }) {
+                if playerHole.netScore < opponentHole.netScore {
+                    wins += 1
+                } else if playerHole.netScore > opponentHole.netScore {
+                    losses += 1
+                }
+            }
+        }
+        if wins > losses {
+            return ("\(wins - losses) UP", .green)
+        } else if losses > wins {
+            return ("", .red)
+        } else {
+            return ("AS", .orange)
+        }
+    }
+
+    var body: some View {
+        Text(matchStatus.text)
+            .frame(width: 28)
+            .font(.system(size: 8, weight: isCurrentHole ? .bold : .medium))
+            .foregroundColor(matchStatus.color)
             .background(
                 isCurrentHole ?
                 RoundedRectangle(cornerRadius: 2)
@@ -343,3 +386,4 @@ struct MatchPlayDetailedView: View {
                round.scores[1].holeScores.contains(where: { $0.holeNumber == hole })
     }
 }
+
