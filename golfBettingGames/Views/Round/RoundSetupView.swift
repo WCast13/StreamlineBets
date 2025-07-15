@@ -100,7 +100,7 @@ struct RoundSetupView: View {
                         }
                     } else {
                         ForEach(Array(selectedPlayers).sorted { $0.name < $1.name }) { player in
-                            PlayerRowForRound(player: player, game: game) {
+                            PlayerRowView.forRound(player, game: game) {
                                 selectedPlayers.remove(player)
                             }
                         }

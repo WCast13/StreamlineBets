@@ -445,7 +445,8 @@ struct MatchPlayDetailsSection: View {
     let currentHoleNumber: Int?
     
     var body: some View {
-        if viewModel.round.game?.gameType == .matchPlay && viewModel.round.scores.count == 2 {
+        if viewModel.round.game?.gameType == .matchPlay &&
+           viewModel.round.scores.count == 2 {
             VStack(spacing: 0) {
                 Divider()
                     .frame(height: 1)
@@ -500,7 +501,7 @@ struct MatchPlayDetailsSection: View {
                 if viewModel.showingMatchPlayDetails {
                     MatchPlayDetailedView(
                         round: viewModel.round,
-                        currentHoleNumber: currentHoleNumber
+                        currentHoleNumber: currentHoleNumber ?? 1
                     )
                     .transition(.opacity.combined(with: .move(edge: .top)))
                 }

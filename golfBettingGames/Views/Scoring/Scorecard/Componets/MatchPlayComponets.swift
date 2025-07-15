@@ -196,10 +196,55 @@ struct MatchPlayTotalStatus: View {
     }
 }
 
+// MARK: - Match Status Cell
+struct MatchStatusCell: View {
+    let hole: Int
+    let matchStatus: (player1Up: Int, player2Up: Int)
+    let isCurrentHole: Bool
+    let hasScore: Bool
+    
+    private var statusText: String {
+        if !hasScore { return "-" }
+        
+        if matchStatus.player1Up > 0 {
+            return "\(matchStatus.player1Up)"
+        } else if matchStatus.player2Up > 0 {
+            return "\(matchStatus.player2Up)"
+        } else {
+            return "AS"
+        }
+    }
+    
+    private var statusColor: Color {
+        if !hasScore { return .secondary }
+        
+        if matchStatus.player1Up > 0 {
+            return .blue
+        } else if matchStatus.player2Up > 0 {
+            return .red
+        } else {
+            return .orange
+        }
+    }
+    
+    var body: some View {
+        Text(statusText)
+            .frame(width: 24, height: 14)
+            .font(.system(size: 7, weight: isCurrentHole ? .bold : .medium))
+            .foregroundColor(statusColor)
+            .background(
+                isCurrentHole ?
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.accentColor.opacity(0.15))
+                    .padding(.horizontal, 1) : nil
+            )
+    }
+}
+
 // MARK: - Match Play Detailed View
 struct MatchPlayDetailedView: View {
     let round: Round
-    let currentHoleNumber: Int?
+    let currentHoleNumber: Int
     
     private var player1Name: String {
         round.scores.first?.player?.name ?? "Player 1"
@@ -291,70 +336,10 @@ struct MatchPlayDetailedView: View {
             .padding(.vertical, 6)
         }
     }
-}
-
-// MARK: - Updated MatchPlayDetailsSection for ScorecardGrid
-extension MatchPlayDetailsSection {
-    init(viewModel: ScorecardViewModel) {
-        self.round = viewModel.round
-        self.currentHoleNumber = nil // You'll need to pass this from parent
-    }
     
-    let round: Round
-    let currentHoleNumber: Int?
-    
-    var body: some View {
-        if round.game?.gameType == .matchPlay && round.scores.count == 2 {
-            VStack(spacing: 0) {
-                Divider()
-                    .frame(height: 1)
-                    .background(Color.accentColor)
-                    .padding(.vertical, 2)
-                
-                // Match Play Section Header
-                HStack(spacing: 0) {
-                    Text("MATCH PLAY")
-                        .frame(width: 60, height: 14, alignment: .leading)
-                        .font(.system(size: 8, weight: .bold))
-                        .foregroundColor(.accentColor)
-                        .padding(.horizontal, 4)
-                    
-                    Spacer()
-                    
-                    // Current Match Status
-                    MatchPlayStatus(round: round)
-                        .padding(.horizontal, 8)
-                }
-                .padding(.vertical, 4)
-                .background(Color.accentColor.opacity(0.1))
-                
-                VStack(spacing: 0) {
-                    // Player 1 Row
-                    MatchPlayPlayerRow(
-                        playerScore: round.scores[0],
-                        opponentScore: round.scores[1],
-                        playerNumber: 1,
-                        currentHoleNumber: currentHoleNumber,
-                        front9Holes: [], // These need to come from viewModel
-                        back9Holes: []
-                    )
-                    
-                    Divider()
-                        .frame(height: 0.5)
-                        .opacity(0.5)
-                    
-                    // Player 2 Row
-                    MatchPlayPlayerRow(
-                        playerScore: round.scores[1],
-                        opponentScore: round.scores[0],
-                        playerNumber: 2,
-                        currentHoleNumber: currentHoleNumber,
-                        front9Holes: [],
-                        back9Holes: []
-                    )
-                }
-                .background(Color.accentColor.opacity(0.05))
-            }
-        }
+    private func hasScoreForHole(_ hole: Int) -> Bool {
+        guard round.scores.count == 2 else { return false }
+        return round.scores[0].holeScores.contains(where: { $0.holeNumber == hole }) &&
+               round.scores[1].holeScores.contains(where: { $0.holeNumber == hole })
     }
 }

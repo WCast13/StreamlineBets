@@ -1,3 +1,11 @@
+//
+//  PlayerRowView.swift
+//  golfBettingGames
+//
+//  Created by William Castellano on 7/14/25.
+//
+
+
 // Views/Player/Components/PlayerRowView.swift
 import SwiftUI
 import SwiftData
@@ -130,3 +138,6 @@ extension PlayerRowView {
         )
     }
 }
+
+// MARK: - PlayerRowForRound (Compatibility alias)
+//typealias PlayerRowForRound = PlayerRowView

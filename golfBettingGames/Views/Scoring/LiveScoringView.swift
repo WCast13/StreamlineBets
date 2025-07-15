@@ -21,7 +21,7 @@ struct LiveScoringView: View {
     @State private var showingScorecard = true
     @State private var showingGameStatus = true
     
-    // NEW: Add scorecard view model
+    // NEW: Add scorecard view model as State
     @State private var scorecardViewModel: ScorecardViewModel
     
     // NEW: Initialize with round
