@@ -27,6 +27,10 @@ final class Round {
     @Relationship(deleteRule: .cascade, inverse: \PlayerScore.round)
     var scores: [PlayerScore] = []
     
+    // ADDED: Team scores relationship
+    @Relationship(deleteRule: .cascade, inverse: \TeamScore.round)
+    var teamScores: [TeamScore] = []
+    
     init(roundNumber: Int, holeNumber: Int? = nil, betAmount: Double, roundType: RoundType, startingHole: Int = 1) {
         self.id = UUID()
         self.roundNumber = roundNumber
@@ -37,5 +41,30 @@ final class Round {
         self.isCompleted = false
         self.startingHole = startingHole
         self.holesPlayed = 0
+    }
+    
+    // ADDED: Helper to get all participants (individual scores and team scores)
+    var allParticipants: [Any] {
+        var participants: [Any] = []
+        
+        // Add individual scores not part of a team
+        participants.append(contentsOf: scores.filter { $0.teamScore == nil })
+        
+        // Add team scores
+        participants.append(contentsOf: teamScores)
+        
+        return participants
+    }
+    
+    // ADDED: Check if this is a team round
+    var isTeamRound: Bool {
+        return !teamScores.isEmpty
+    }
+    
+    // ADDED: Total pot calculation including teams
+    var totalPot: Double {
+        let individualCount = scores.filter { $0.teamScore == nil }.count
+        let teamCount = teamScores.count
+        return betAmount * Double(individualCount + teamCount)
     }
 }

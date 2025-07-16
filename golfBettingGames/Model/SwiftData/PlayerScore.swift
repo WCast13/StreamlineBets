@@ -22,6 +22,7 @@ final class PlayerScore {
     // Relationships
     var player: Player?
     var round: Round?
+    var teamScore: TeamScore?
     
     @Relationship(deleteRule: .cascade, inverse: \HoleScore.playerScore)
     var holeScores: [HoleScore] = []
@@ -38,6 +39,8 @@ final class PlayerScore {
     func updateTotalScores() {
         score = holeScores.reduce(0) { $0 + $1.grossScore }
         netScore = holeScores.reduce(0) { $0 + $1.netScore }
+        
+        teamScore?.updateTeamScores()
     }
     
     var front9Score: Int {

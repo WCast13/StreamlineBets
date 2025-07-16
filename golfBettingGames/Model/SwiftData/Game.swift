@@ -22,6 +22,9 @@ final class Game {
     var isCompleted: Bool
     var notes: String
     
+    // ADDED: Game format (individual vs team)
+    var gameFormat: GameFormat
+    
     // New properties for course integration
     var course: Course?
     var selectedTee: Tee?
@@ -33,7 +36,10 @@ final class Game {
     
     @Relationship var players: [Player] = []
     
-    init(name: String, gameType: GameType, courseName: String, courseRating: Double = 72.0, slopeRating: Double = 113.0, par: Int = 72) {
+    // ADDED: Team relationships
+    @Relationship var teams: [Team] = []
+    
+    init(name: String, gameType: GameType, courseName: String, courseRating: Double = 72.0, slopeRating: Double = 113.0, par: Int = 72, gameFormat: GameFormat = .individual) {
         self.id = UUID()
         self.name = name
         self.gameType = gameType
@@ -44,6 +50,7 @@ final class Game {
         self.par = par
         self.isCompleted = false
         self.notes = ""
+        self.gameFormat = gameFormat
     }
     
     // Helper to get the appropriate rating/slope
@@ -70,5 +77,39 @@ final class Game {
             }
         }
         return total
+    }
+    
+    // ADDED: Calculate total winnings/losses for a team in this game
+    func totalForTeam(_ team: Team) -> Double {
+        var total = 0.0
+        for round in rounds {
+            if let teamScore = round.teamScores.first(where: { $0.team?.id == team.id }) {
+                total += teamScore.winnings
+            }
+        }
+        return total
+    }
+    
+    // ADDED: Get all participants (players and/or teams)
+    var allParticipants: [Any] {
+        switch gameFormat {
+        case .individual:
+            return players
+        case .team:
+            return teams
+        case .mixed:
+            return players + teams
+        }
+    }
+}
+
+// MARK: - Game Format Enum
+enum GameFormat: String, Codable, CaseIterable {
+    case individual = "Individual"
+    case team = "Team"
+    case mixed = "Mixed" // Both individuals and teams
+    
+    var description: String {
+        return self.rawValue
     }
 }

@@ -80,23 +80,51 @@ class DataInitializer {
             context.insert(hole)
         }
         
-        // Create two players
+        // Create four players
         let player1 = Player(name: "John Smith", handicapIndex: 8.5)
         let player2 = Player(name: "Mike Johnson", handicapIndex: 12.3)
+        let player3 = Player(name: "Sarah Williams", handicapIndex: 15.2)
+        let player4 = Player(name: "Tom Davis", handicapIndex: 6.7)
         
-        // Create an active skins game
+        // ADDED: Create two teams
+        let team1 = Team(name: "Team Alpha", players: [player1, player2])
+        let team2 = Team(name: "Team Beta", players: [player3, player4])
+        
+        // Update player team relationships
+        player1.teams.append(team1)
+        player2.teams.append(team1)
+        player3.teams.append(team2)
+        player4.teams.append(team2)
+        
+        // Create an active skins game (individual)
         let game = Game(
             name: "Saturday Skins",
             gameType: .skins,
             courseName: course.name,
             courseRating: whiteTees.menRating,
             slopeRating: Double(whiteTees.menSlope),
-            par: course.par
+            par: course.par,
+            gameFormat: .individual  // ADDED: Specify game format
         )
         game.course = course
         game.selectedTee = whiteTees
         game.selectedGender = .men
         game.players = [player1, player2]
+        
+        // ADDED: Create a team game (scramble)
+        let teamGame = Game(
+            name: "Team Scramble",
+            gameType: .scramble,
+            courseName: course.name,
+            courseRating: whiteTees.menRating,
+            slopeRating: Double(whiteTees.menSlope),
+            par: course.par,
+            gameFormat: .team  // ADDED: Team format
+        )
+        teamGame.course = course
+        teamGame.selectedTee = whiteTees
+        teamGame.selectedGender = .men
+        teamGame.teams = [team1, team2]
         
         // Create first round (Hole 1)
         let round1 = Round(
@@ -146,12 +174,50 @@ class DataInitializer {
         
         game.rounds = [round1, round2]
         
+        // ADDED: Create a team round for the team game
+        let teamRound = Round(
+            roundNumber: 1,
+            betAmount: 50.0,
+            roundType: .front9
+        )
+        teamRound.game = teamGame
+        
+        // Create team scores
+        let teamScore1 = TeamScore(team: team1, scoringType: .bestBall)
+        teamScore1.round = teamRound
+        
+        let teamScore2 = TeamScore(team: team2, scoringType: .bestBall)
+        teamScore2.round = teamRound
+        
+        // Create individual player scores within team scores
+        let p1Score = PlayerScore(player: player1)
+        p1Score.teamScore = teamScore1
+        let p2Score = PlayerScore(player: player2)
+        p2Score.teamScore = teamScore1
+        
+        let p3Score = PlayerScore(player: player3)
+        p3Score.teamScore = teamScore2
+        let p4Score = PlayerScore(player: player4)
+        p4Score.teamScore = teamScore2
+        
+        teamScore1.playerScores = [p1Score, p2Score]
+        teamScore2.playerScores = [p3Score, p4Score]
+        
+        teamRound.teamScores = [teamScore1, teamScore2]
+        teamRound.isCompleted = false
+        
+        teamGame.rounds = [teamRound]
+        
         // Insert all entities
         context.insert(course)
         context.insert(blueTees)
         context.insert(whiteTees)
         context.insert(player1)
         context.insert(player2)
+        context.insert(player3)
+        context.insert(player4)
+        context.insert(team1)
+        context.insert(team2)
         context.insert(game)
         context.insert(round1)
         context.insert(round2)
@@ -159,6 +225,14 @@ class DataInitializer {
         context.insert(score1_2)
         context.insert(score2_1)
         context.insert(score2_2)
+        context.insert(teamGame)
+        context.insert(teamRound)
+        context.insert(teamScore1)
+        context.insert(teamScore2)
+        context.insert(p1Score)
+        context.insert(p2Score)
+        context.insert(p3Score)
+        context.insert(p4Score)
         
         // Save
         do {
