@@ -5,7 +5,6 @@
 //  Created by William Castellano on 7/14/25.
 //
 
-
 import SwiftUI
 import SwiftData
 
@@ -82,7 +81,6 @@ import SwiftData
 //                Spacer()
 //            }
 //            .padding(.vertical, 4)
-//            .background(Color.gray.opacity(0.1))
 //            
 //            // Hole-by-hole match status
 //            HStack(spacing: 0) {

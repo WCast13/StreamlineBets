@@ -120,7 +120,6 @@ struct EmptyStateView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(UIColor.systemGroupedBackground))
         .sheet(isPresented: $showingNewGame) {
             NewGameView()
         }
@@ -181,7 +180,6 @@ struct ActiveRoundCard: View {
             }
             .padding()
             .frame(maxWidth: .infinity)
-            .background(Color(UIColor.secondarySystemBackground))
             .cornerRadius(16)
             .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
@@ -200,7 +198,6 @@ struct QuickStartItem: View {
                 .font(.title2)
                 .foregroundColor(.accentColor)
                 .frame(width: 50, height: 50)
-                .background(Color.accentColor.opacity(0.1))
                 .cornerRadius(12)
             
             Text(title)

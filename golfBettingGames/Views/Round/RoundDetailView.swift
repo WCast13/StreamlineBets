@@ -52,16 +52,6 @@ struct RoundDetailView: View {
                             .padding()
                         }
                         .listRowInsets(EdgeInsets())
-                        .listRowBackground(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Color.orange, Color.orange.opacity(0.8)],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                        )
                     }
                 }
                 

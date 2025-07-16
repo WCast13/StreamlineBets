@@ -63,14 +63,6 @@ struct GameStatusView: View {
             }
         }
         .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(UIColor.secondarySystemBackground))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-        )
     }
 }
 
@@ -726,7 +718,5 @@ struct BestBallStatusView: View {
                 .padding()
         }
     }
-    .background(Color(UIColor.systemGroupedBackground))
     .modelContainer(container)
 }
-

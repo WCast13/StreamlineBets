@@ -67,3 +67,4 @@ struct EditPlayerView: View {
         dismiss()
     }
 }
+

@@ -356,7 +356,6 @@ struct MatchPlayDetailedView: View {
                 Spacer()
             }
             .padding(.vertical, 4)
-            .background(Color.gray.opacity(0.1))
             
             // Match Status Key
             HStack(spacing: 20) {

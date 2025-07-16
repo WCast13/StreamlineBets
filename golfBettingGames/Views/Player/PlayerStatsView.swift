@@ -95,7 +95,6 @@ struct PlayerStatsView: View {
                     }
                 }
                 .padding()
-                .background(Color(UIColor.secondarySystemBackground))
                 .cornerRadius(16)
                 
                 // Stats Grid
@@ -149,7 +148,6 @@ struct PlayerStatsView: View {
                         .padding(.vertical)
                     }
                     .padding()
-                    .background(Color(UIColor.secondarySystemBackground))
                     .cornerRadius(16)
                 }
                 
@@ -163,7 +161,6 @@ struct PlayerStatsView: View {
                     }
                 }
                 .padding()
-                .background(Color(UIColor.secondarySystemBackground))
                 .cornerRadius(16)
             }
             .padding()
@@ -212,5 +209,3 @@ struct PlayerStatsView: View {
 //        .cornerRadius(12)
 //    }
 //}
-
-

@@ -50,7 +50,7 @@ struct PlayerInfoCard: View {
             }
         }
         .padding()
-        .background(Color.gray.opacity(0.05))
         .cornerRadius(12)
     }
 }
+

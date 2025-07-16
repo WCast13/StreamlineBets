@@ -284,7 +284,6 @@ struct StatCard: View {
                 .padding()
         }
     }
-    .background(Color(UIColor.systemGroupedBackground))
     .modelContainer(container)
 }
 
@@ -378,7 +377,6 @@ struct StatCard: View {
                 .padding()
         }
     }
-    .background(Color(UIColor.systemGroupedBackground))
     .modelContainer(container)
 }
 
@@ -453,7 +451,6 @@ struct StatCard: View {
                 .padding()
         }
     }
-    .background(Color(UIColor.systemGroupedBackground))
     .modelContainer(container)
 }
 
@@ -534,7 +531,6 @@ struct StatCard: View {
                 .padding()
         }
     }
-    .background(Color(UIColor.systemGroupedBackground))
     .modelContainer(container)
 }
 
@@ -677,6 +673,6 @@ struct StatCard: View {
         }
         .padding()
     }
-    .background(Color(UIColor.systemGroupedBackground))
     .modelContainer(container)
 }
+

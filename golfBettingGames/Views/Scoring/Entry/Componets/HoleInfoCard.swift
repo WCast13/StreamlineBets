@@ -59,7 +59,6 @@ struct HoleInfoCard: View {
         )
     )
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
 }
 
 #Preview("Par 4") {
@@ -72,7 +71,6 @@ struct HoleInfoCard: View {
         )
     )
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
 }
 
 #Preview("Par 5") {
@@ -85,7 +83,6 @@ struct HoleInfoCard: View {
         )
     )
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
 }
 
 #Preview("Multiple Holes") {
@@ -142,5 +139,4 @@ struct HoleInfoCard: View {
         Spacer()
     }
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
 }

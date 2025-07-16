@@ -71,7 +71,6 @@ struct LiveScorecardView: View {
             }
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background(Color(UIColor.tertiarySystemBackground))
             
             ScrollView(.horizontal, showsIndicators: false) {
                 VStack(spacing: 0) {
@@ -130,7 +129,6 @@ struct LiveScorecardView: View {
                             .foregroundColor(.green)
                     }
                     .padding(.vertical, 0)
-                    .background(Color(UIColor.secondarySystemBackground))
                     
                     // Par Row
                     HStack(spacing: 0) {
@@ -237,7 +235,6 @@ struct LiveScorecardView: View {
                                 .padding(.horizontal, 8)
                         }
                         .padding(.vertical, 4)
-                        .background(Color.accentColor.opacity(0.1))
                         
                         VStack(spacing: 0) {
                             // Player 1 Row
@@ -264,7 +261,6 @@ struct LiveScorecardView: View {
                                 back9Holes: back9Holes
                             )
                         }
-                        .background(Color.accentColor.opacity(0.05))
                         
                         // ADDED: Expandable Match Play Details
                         if showingMatchPlayDetails {
@@ -279,7 +275,6 @@ struct LiveScorecardView: View {
             }
             .font(.system(.body, design: .monospaced))
         }
-        .background(Color(UIColor.systemBackground))
         .cornerRadius(6)
         .shadow(color: Color.black.opacity(0.05), radius: 1, x: 0, y: 1)
     }
@@ -322,7 +317,6 @@ struct MatchPlayLegend: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(Color.gray.opacity(0.1))
         .cornerRadius(4)
     }
 }
@@ -437,6 +431,6 @@ struct MatchPlayLegend: View {
         
         Spacer()
     }
-    .background(Color(UIColor.systemGroupedBackground))
     .modelContainer(container)
 }
+

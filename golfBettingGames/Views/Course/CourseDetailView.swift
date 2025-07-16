@@ -67,3 +67,4 @@ struct CourseDetailView: View {
         }
     }
 }
+

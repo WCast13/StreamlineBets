@@ -280,6 +280,6 @@ struct PlayerScorecardRow: View {
         )
         .padding()
     }
-    .background(Color(UIColor.systemGroupedBackground))
     .modelContainer(container)
 }
+

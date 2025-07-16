@@ -60,7 +60,6 @@ struct CompactHoleInfoView: View {
             }
         }
         .padding(.vertical, 4)
-//        .background()
         .cornerRadius(10)
     }
     
@@ -125,7 +124,6 @@ struct CompactHoleInfoView: View {
         }
         .padding()
         .frame(maxWidth: .infinity)
-//        .background(Color(UIColor.tertiarySystemBackground))
         .cornerRadius(12)
     }
     
@@ -204,7 +202,6 @@ struct UltraCompactHoleInfoView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-//        .background(Color(UIColor.tertiarySystemBackground))
         .cornerRadius(8)
     }
 }
@@ -317,7 +314,6 @@ struct HorizontalHoleInfoView: View {
             Spacer()
         }
         .padding()
-        .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(10)
     }
     
@@ -348,7 +344,6 @@ struct HorizontalHoleInfoView: View {
         hole: Hole(number: 7, par: 4, handicap: 5, distance: 385)
     )
     .padding()
-//    .background(Color(UIColor.systemGroupedBackground))
     .previewDevice("iPhone 15 Pro")
 }
 
@@ -369,7 +364,6 @@ struct HorizontalHoleInfoView: View {
         )
     }
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
     .previewDevice("iPad Pro (11-inch)")
 }
 
@@ -423,7 +417,6 @@ struct HorizontalHoleInfoView: View {
         }
         .padding()
     }
-    .background(Color(UIColor.systemGroupedBackground))
 }
 
 #Preview("Compact Mode - Various Holes") {
@@ -456,7 +449,6 @@ struct HorizontalHoleInfoView: View {
         )
     }
     .padding()
-//    .background(Color(UIColor.systemGroupedBackground))
 }
 
 #Preview("Ultra Compact Mode") {
@@ -486,7 +478,6 @@ struct HorizontalHoleInfoView: View {
         )
     }
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
 }
 
 #Preview("Expanded Mode") {
@@ -498,5 +489,4 @@ struct HorizontalHoleInfoView: View {
         compactMode: false
     )
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
 }

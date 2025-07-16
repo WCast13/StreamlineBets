@@ -417,7 +417,6 @@ struct ScoreEntryView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding()
-                    .background(Color.gray.opacity(0.1))
                     .cornerRadius(8)
                     .padding()
             }
@@ -426,3 +425,4 @@ struct ScoreEntryView: View {
     
     return InteractiveDemo()
 }
+

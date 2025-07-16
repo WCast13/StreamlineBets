@@ -47,7 +47,6 @@ struct ScorecardSection: View {
                         .fontWeight(.semibold)
                 }
                 .padding(.vertical, 8)
-                .background(Color.gray.opacity(0.1))
                 
                 // Par Row
                 HStack(spacing: 0) {
@@ -106,8 +105,8 @@ struct ScorecardSection: View {
             }
             .font(.system(.body, design: .monospaced))
             .padding()
-            .background(Color.gray.opacity(0.05))
             .cornerRadius(8)
         }
     }
 }
+

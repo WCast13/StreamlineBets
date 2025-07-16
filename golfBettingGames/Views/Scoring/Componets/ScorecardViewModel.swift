@@ -88,7 +88,6 @@ struct ScorecardHeader: View {
         }
         .padding(.horizontal, isCompact ? 8 : 12)
         .padding(.vertical, isCompact ? 4 : 6)
-        .background(Color(UIColor.tertiarySystemBackground))
     }
 }
 
@@ -190,7 +189,6 @@ struct ScorecardHoleRow: View {
                 .foregroundColor(.green)
         }
         .padding(.vertical, 4)
-        .background(Color(UIColor.secondarySystemBackground))
     }
 }
 
@@ -474,7 +472,6 @@ struct MatchPlayDetailsSection: View {
                         .padding(.horizontal, 8)
                 }
                 .padding(.vertical, 4)
-                .background(Color.accentColor.opacity(0.1))
                 
                 VStack(spacing: 0) {
                     // Player 1 Row
@@ -501,7 +498,6 @@ struct MatchPlayDetailsSection: View {
                         back9Holes: viewModel.back9Holes
                     )
                 }
-                .background(Color.accentColor.opacity(0.05))
                 
                 // Expandable Match Play Details
 //                if viewModel.showingMatchPlayDetails {
@@ -515,3 +511,4 @@ struct MatchPlayDetailsSection: View {
         }
     }
 }
+

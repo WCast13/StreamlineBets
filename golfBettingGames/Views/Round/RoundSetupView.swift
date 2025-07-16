@@ -88,7 +88,6 @@ struct RoundSetupView: View {
                         }
                         .padding(.horizontal)
                     }
-                    .listRowInsets(EdgeInsets())
                 }
                 
                 // Players Section
@@ -215,3 +214,4 @@ struct RoundSetupView: View {
         }
     }
 }
+

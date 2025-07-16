@@ -56,7 +56,6 @@ struct HoleProgressView: View {
         )
     }
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
 }
 
 #Preview("Middle of Round") {
@@ -76,7 +75,6 @@ struct HoleProgressView: View {
         )
     }
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
 }
 
 #Preview("End of Round") {
@@ -96,7 +94,6 @@ struct HoleProgressView: View {
         )
     }
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
 }
 
 #Preview("Different Round Types") {
@@ -153,7 +150,6 @@ struct HoleProgressView: View {
         }
     }
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
 }
 
 #Preview("Interactive Progress") {
@@ -196,6 +192,4 @@ struct HoleProgressView: View {
     }
     
     return InteractiveProgress()
-        .background(Color(UIColor.systemGroupedBackground))
 }
-

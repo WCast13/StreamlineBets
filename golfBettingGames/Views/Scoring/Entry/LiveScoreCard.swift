@@ -81,7 +81,6 @@ struct LiveScoreCard: View {
         }
         .padding(.horizontal, 4)
         .padding(.vertical, 3)
-        .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(8)
     }
 }
@@ -234,7 +233,6 @@ struct ScoreToPar: View {
         Spacer()
     }
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
     .modelContainer(container)
 }
 
@@ -306,7 +304,6 @@ struct ScoreToPar: View {
         Spacer()
     }
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
     .modelContainer(container)
 }
 // MARK: - Score to Par Pill

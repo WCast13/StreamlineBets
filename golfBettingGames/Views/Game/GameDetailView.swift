@@ -124,3 +124,4 @@ struct GameDetailView: View {
         return formatter.string(from: NSNumber(value: amount)) ?? "$0.00"
     }
 }
+

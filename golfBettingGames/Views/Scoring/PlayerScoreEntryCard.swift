@@ -44,7 +44,6 @@ struct PlayerScoreEntryCard: View {
                         .foregroundColor(.blue)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color.blue.opacity(0.1))
                         .cornerRadius(8)
                 }
             }
@@ -63,9 +62,6 @@ struct PlayerScoreEntryCard: View {
                                     .font(.system(.body, design: .rounded))
                                     .fontWeight(score == num ? .semibold : .regular)
                                     .frame(width: 36, height: 36)
-                                    .background(
-                                        score == num ? Color.accentColor : Color.gray.opacity(0.2)
-                                    )
                                     .foregroundColor(score == num ? .white : .primary)
                                     .cornerRadius(8)
                             }
@@ -84,7 +80,6 @@ struct PlayerScoreEntryCard: View {
             }
         }
         .padding()
-        .background(Color.gray.opacity(0.05))
         .cornerRadius(12)
     }
 }
