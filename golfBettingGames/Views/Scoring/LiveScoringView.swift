@@ -77,19 +77,6 @@ struct LiveScoringView: View {
                 // UPDATED: New scorecard implementation
                 if showingScorecard {
                     VStack(spacing: 0) {
-                        // Scorecard toggle button
-                        HStack {
-                            Button(action: { withAnimation { showingScorecard.toggle() } }) {
-                                Label(
-                                    showingScorecard ? "Hide Scorecard" : "Show Scorecard",
-                                    systemImage: showingScorecard ? "chevron.up" : "chevron.down"
-                                )
-                                .font(.caption)
-                                .foregroundColor(.accentColor)
-                            }
-                            .padding(.horizontal)
-                            .padding(.vertical, 4)
-                        }
                         
                         // New scorecard components
                         VStack(spacing: 0) {
@@ -107,14 +94,24 @@ struct LiveScoringView: View {
                                     onScoreTap: nil
                                 )
                             }
+                            
                         }
-                        .glassEffect()
                         .padding(.horizontal)
                         .padding(.bottom, 8)
                     }
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 
+                // Scorecard toggle button
+                Button(action: { withAnimation { showingScorecard.toggle() } }) {
+                                    Label(
+                                        showingScorecard ? "Hide Scorecard" : "Show Scorecard",
+                                        systemImage: showingScorecard ? "chevron.up" : "chevron.down"
+                                    )
+                                    .font(.caption)
+                                    .foregroundColor(.accentColor)
+                                }
+                                .padding(.bottom)
                 // Main scoring content
                 ScrollView {
                     VStack(spacing: 0) {
@@ -122,7 +119,6 @@ struct LiveScoringView: View {
                         VStack(spacing: 16) {
                             CompactHoleInfoView(currentHole: currentHole, totalHoles: totalHoles, holeNumber: currentHoleNumber, hole: currentHoleInfo)
                         }
-                        .glassEffect()
                         .padding()
                         
                         Spacer(minLength: 0)
@@ -143,7 +139,6 @@ struct LiveScoringView: View {
                             }
                         }
                         .padding()
-                        .glassEffect()
                         
                         // Bottom Navigation
                         VStack(spacing: 12) {
@@ -159,6 +154,7 @@ struct LiveScoringView: View {
                                     .frame(maxWidth: .infinity)
                                 }
                                 .buttonStyle(.bordered)
+                                .controlSize(.small)
                                 .disabled(currentHole == 1)
                                 
                                 // Next Hole or Finish
@@ -170,6 +166,7 @@ struct LiveScoringView: View {
                                     .frame(maxWidth: .infinity)
                                 }
                                 .buttonStyle(.borderedProminent)
+                                .controlSize(.small)
                                 .disabled(!allScoresEntered)
                             }
                         }
@@ -177,7 +174,6 @@ struct LiveScoringView: View {
                     }
                 }
             }
-            .glassEffect()
             .navigationTitle("Live Scoring")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

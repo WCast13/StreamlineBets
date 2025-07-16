@@ -47,36 +47,20 @@ struct ScorecardHeader: View {
     
     var body: some View {
         HStack {
-            Text(isCompact ? "SCORES" : "SCORECARD")
-                .font(.system(size: isCompact ? 10 : 12, weight: .bold))
-                .foregroundColor(.secondary)
-            
-            Spacer()
-            
-            // Info toggles
-            HStack(spacing: 8) {
+            if viewModel.round.game?.gameType == .matchPlay {
                 Button {
                     withAnimation(.easeInOut(duration: 0.2)) {
-                        viewModel.showingStrokeInfo.toggle()
+                        viewModel.showingMatchPlayDetails.toggle()
                     }
                 } label: {
-                    Image(systemName: viewModel.showingStrokeInfo ? "info.circle.fill" : "info.circle")
+                    Image(systemName: viewModel.showingMatchPlayDetails ? "flag.2.crossed.fill" : "flag.2.crossed")
                         .font(.system(size: isCompact ? 12 : 14))
                         .foregroundColor(.accentColor)
                 }
                 
-                if viewModel.round.game?.gameType == .matchPlay {
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            viewModel.showingMatchPlayDetails.toggle()
-                        }
-                    } label: {
-                        Image(systemName: viewModel.showingMatchPlayDetails ? "flag.2.crossed.fill" : "flag.2.crossed")
-                            .font(.system(size: isCompact ? 12 : 14))
-                            .foregroundColor(.accentColor)
-                    }
-                }
+                
             }
+            Spacer()
             
             if let courseName = viewModel.round.game?.courseName {
                 Text(courseName)
@@ -86,7 +70,6 @@ struct ScorecardHeader: View {
                     .frame(maxWidth: 150)
             }
         }
-        .padding(.horizontal, isCompact ? 8 : 12)
         .padding(.vertical, isCompact ? 4 : 6)
     }
 }
@@ -130,8 +113,8 @@ struct ScorecardGrid: View {
             }
             
             // Match play details if applicable
-            if viewModel.round.game?.gameType == .matchPlay && 
-               viewModel.showingMatchPlayDetails {
+            if viewModel.round.game?.gameType == .matchPlay &&
+                viewModel.showingMatchPlayDetails {
                 MatchPlayDetailsSection(
                     viewModel: viewModel,
                     currentHoleNumber: currentHoleNumber
@@ -450,7 +433,7 @@ struct MatchPlayDetailsSection: View {
     
     var body: some View {
         if viewModel.round.game?.gameType == .matchPlay &&
-           viewModel.round.scores.count == 2 {
+            viewModel.round.scores.count == 2 {
             VStack(spacing: 0) {
                 Divider()
                     .frame(height: 1)
@@ -500,13 +483,13 @@ struct MatchPlayDetailsSection: View {
                 }
                 
                 // Expandable Match Play Details
-//                if viewModel.showingMatchPlayDetails {
-//                    MatchPlayDetailedView(
-//                        round: viewModel.round,
-//                        currentHoleNumber: currentHoleNumber ?? 1
-//                    )
-//                    .transition(.opacity.combined(with: .move(edge: .top)))
-//                }
+                //                if viewModel.showingMatchPlayDetails {
+                //                    MatchPlayDetailedView(
+                //                        round: viewModel.round,
+                //                        currentHoleNumber: currentHoleNumber ?? 1
+                //                    )
+                //                    .transition(.opacity.combined(with: .move(edge: .top)))
+                //                }
             }
         }
     }
