@@ -92,7 +92,7 @@ struct LiveScoringView: View {
                             
                             Spacer()
                         }
-                        .background(Color(UIColor.secondarySystemBackground))
+//                        .background(Color(UIColor.secondarySystemBackground))
                         
                         // New scorecard components
                         VStack(spacing: 0) {
@@ -111,13 +111,13 @@ struct LiveScoringView: View {
                                 )
                             }
                         }
-                        .background(Color(UIColor.systemBackground))
+//                        .background(Color(UIColor.systemBackground))
                         .cornerRadius(6)
                         .shadow(color: Color.black.opacity(0.05), radius: 1, x: 0, y: 1)
                         .padding(.horizontal)
                         .padding(.bottom, 8)
                     }
-                    .background(Color(UIColor.secondarySystemBackground))
+//                    .background(Color(UIColor.secondarySystemBackground))
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 
@@ -126,18 +126,8 @@ struct LiveScoringView: View {
                     VStack(spacing: 0) {
                         // Top Section - Hole Info
                         VStack(spacing: 16) {
-                            // Hole Progress Indicator
-                            HoleProgressView(
-                                currentHole: currentHole,
-                                totalHoles: totalHoles,
-                                holeNumber: currentHoleNumber
-                            )
-                            
-                            // Hole Details
-                            if let hole = currentHoleInfo {
-                                HoleInfoCard(hole: hole)
-                            }
-                        }
+                            CompactHoleInfoView(currentHole: currentHole, totalHoles: totalHoles, holeNumber: currentHoleNumber, hole: currentHoleInfo)
+                        }.glassEffect()
                         .padding()
                         
                         Spacer(minLength: 0)
@@ -162,17 +152,6 @@ struct LiveScoringView: View {
                         // Bottom Navigation
                         VStack(spacing: 12) {
                             // Quick Score Buttons for Common Scores
-                            if allScoresEntered {
-                                HStack {
-                                    Text("All scores entered")
-                                        .font(.caption)
-                                        .foregroundColor(.green)
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                        .imageScale(.small)
-                                }
-                                .padding(.top, 8)
-                            }
                             
                             HStack(spacing: 16) {
                                 // Previous Hole
@@ -204,6 +183,7 @@ struct LiveScoringView: View {
             }
             .navigationTitle("Live Scoring")
             .navigationBarTitleDisplayMode(.inline)
+//            .background(Color(.gray))
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Exit") {
