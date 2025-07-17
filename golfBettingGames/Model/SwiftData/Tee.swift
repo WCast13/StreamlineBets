@@ -10,7 +10,6 @@ import SwiftData
 
 // MARK: - Tee Model
 @Model
-
 final class Tee {
     var id: UUID
     var name: String
@@ -51,6 +50,3 @@ final class Tee {
         }
     }
 }
-import Foundation
-import SwiftData
-

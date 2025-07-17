@@ -13,14 +13,12 @@ extension ModelContainer {
     static var golfBettingContainer: ModelContainer = {
         let schema = Schema([
             Player.self,
-            Team.self,
             Course.self,
             Tee.self,
             Hole.self,
             Game.self,
             Round.self,
             PlayerScore.self,
-            TeamScore.self,
             HoleScore.self
         ])
         
