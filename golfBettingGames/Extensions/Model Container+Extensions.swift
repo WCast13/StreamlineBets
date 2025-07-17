@@ -19,7 +19,8 @@ extension ModelContainer {
             Game.self,
             Round.self,
             PlayerScore.self,
-            HoleScore.self
+            HoleScore.self,
+            Team.self
         ])
         
         let modelConfiguration = ModelConfiguration(
