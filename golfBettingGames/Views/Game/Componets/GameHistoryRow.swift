@@ -57,3 +57,11 @@ struct GameHistoryRow: View {
         return formatter.string(from: NSNumber(value: amount)) ?? "$0.00"
     }
 }
+
+//
+//  TeamListView.swift
+//  golfBettingGames
+//
+//  Created by Assistant on [Date]
+//
+

@@ -104,14 +104,14 @@ struct RoundStatusCard: View {
             
             // Stats Grid
             HStack(spacing: 16) {
-                StatCard(
+                RoundStatCard(
                     title: "Players",
                     value: "\(round.scores.count)",
                     icon: "person.2.fill",
                     color: .blue
                 )
                 
-                StatCard(
+                RoundStatCard(
                     title: "Bet Amount",
                     value: "$\(Int(round.betAmount))",
                     icon: "dollarsign.circle.fill",
@@ -119,7 +119,7 @@ struct RoundStatusCard: View {
                 )
                 
                 if let leader = currentLeader {
-                    StatCard(
+                    RoundStatCard(
                         title: "Leader",
                         value: leader.player?.name ?? "Unknown",
                         subtitle: "Net: \(leader.score)",
@@ -141,7 +141,7 @@ struct RoundStatusCard: View {
     }
 }
 
-struct StatCard: View {
+struct RoundStatCard: View {
     let title: String
     let value: String
     var subtitle: String? = nil
@@ -180,6 +180,8 @@ struct StatCard: View {
         .cornerRadius(12)
     }
 }
+
+
 
 // MARK: - RoundStatusCard Preview
 #Preview("In Progress - Full 18") {

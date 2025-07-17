@@ -90,6 +90,17 @@ struct ContentView: View {
                 Label("Courses", systemImage: "mappin.and.ellipse")
             }
             .tag(2)
+            
+            NavigationStack {
+                TeamListView()
+            }
+            .tabItem {
+                Label("Teams", systemImage: "person.3.fill")
+            }
+            .tag(3)
+        }
+        .sheet(isPresented: $showingNewGame) {
+            NewGameView()
         }
         .sheet(isPresented: $showingNewGame) {
             NewGameView()
