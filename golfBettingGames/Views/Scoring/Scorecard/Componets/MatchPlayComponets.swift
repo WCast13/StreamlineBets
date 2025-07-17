@@ -139,11 +139,11 @@ struct MatchPlayCellResult: View {
         
         // Simple hole result
         if playerHole.netScore < opponentHole.netScore {
-            return ("W", .green)  // Won hole
+            return ("W", .primary)  // Won hole
         } else if playerHole.netScore > opponentHole.netScore {
-            return ("L", .red)    // Lost hole
+            return ("L", .primary)    // Lost hole
         } else {
-            return ("H", .orange) // Halved hole
+            return ("H", .primary) // Halved hole
         }
     }
     
@@ -182,11 +182,11 @@ struct MatchPlayCellStatus: View {
             }
         }
         if wins > losses {
-            return ("\(wins - losses) UP", .green)
+            return ("\(wins - losses) UP", .primary)
         } else if losses > wins {
-            return ("", .red)
+            return ("", .primary)
         } else {
-            return ("AS", .orange)
+            return ("AS", .primary)
         }
     }
 

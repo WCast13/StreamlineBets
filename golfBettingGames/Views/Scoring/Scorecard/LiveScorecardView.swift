@@ -271,6 +271,15 @@ struct LiveScorecardView: View {
                             .transition(.opacity.combined(with: .move(edge: .top)))
                         }
                     }
+                    
+                    if round.game?.gameType == .nassau && round.scores.count >= 2 {
+                        Divider()
+                            .frame(height: 1)
+                            .background(Color.purple)
+                            .padding(.vertical, 2)
+                        
+                        NassauStatusView(round: round)
+                    }
                 }
             }
             .font(.system(.body, design: .monospaced))

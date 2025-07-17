@@ -67,25 +67,25 @@ class GameScoringCalculator {
     }
     
     // MARK: - Nassau Scoring
-    static func calculateNassauWinnings(for round: Round) {
-        guard round.roundType == .full18 else { return }
-        
-        let scores = round.scores
-        let betAmount = round.betAmount
-        
-        // Calculate Front 9, Back 9, and Total winners
-        let front9Winners = calculateNineHoleWinners(scores: scores, holes: 1...9)
-        let back9Winners = calculateNineHoleWinners(scores: scores, holes: 10...18)
-        let totalWinners = calculateTotalWinners(scores: scores)
-        
-        // Reset all winnings
-        scores.forEach { $0.winnings = 0 }
-        
-        // Award winnings for each bet (3 bets total in Nassau)
-        awardWinnings(winners: front9Winners, allScores: scores, betAmount: betAmount)
-        awardWinnings(winners: back9Winners, allScores: scores, betAmount: betAmount)
-        awardWinnings(winners: totalWinners, allScores: scores, betAmount: betAmount)
-    }
+//    static func calculateNassauWinnings(for round: Round) {
+//        guard round.roundType == .full18 else { return }
+//        
+//        let scores = round.scores
+//        let betAmount = round.betAmount
+//        
+//        // Calculate Front 9, Back 9, and Total winners
+//        let front9Winners = calculateNineHoleWinners(scores: scores, holes: 1...9)
+//        let back9Winners = calculateNineHoleWinners(scores: scores, holes: 10...18)
+//        let totalWinners = calculateTotalWinners(scores: scores)
+//        
+//        // Reset all winnings
+//        scores.forEach { $0.winnings = 0 }
+//        
+//        // Award winnings for each bet (3 bets total in Nassau)
+//        awardWinnings(winners: front9Winners, allScores: scores, betAmount: betAmount)
+//        awardWinnings(winners: back9Winners, allScores: scores, betAmount: betAmount)
+//        awardWinnings(winners: totalWinners, allScores: scores, betAmount: betAmount)
+//    }
     
     // MARK: - Match Play Scoring
     static func calculateMatchPlayWinnings(for round: Round) {
