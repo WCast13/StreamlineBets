@@ -27,6 +27,8 @@ final class Round {
     @Relationship(deleteRule: .cascade, inverse: \PlayerScore.round)
     var scores: [PlayerScore] = []
     
+    @Relationship var teams: [Team] = []
+    
     init(roundNumber: Int, holeNumber: Int? = nil, betAmount: Double, roundType: RoundType, startingHole: Int = 1) {
         self.id = UUID()
         self.roundNumber = roundNumber

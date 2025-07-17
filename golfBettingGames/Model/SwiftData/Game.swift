@@ -32,6 +32,7 @@ final class Game {
     var rounds: [Round] = []
     
     @Relationship var players: [Player] = []
+    @Relationship var teams: [Team] = []
     
     init(name: String, gameType: GameType, courseName: String, courseRating: Double = 72.0, slopeRating: Double = 113.0, par: Int = 72) {
         self.id = UUID()

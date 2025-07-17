@@ -24,6 +24,8 @@ final class Player {
     @Relationship(inverse: \Game.players)
     var games: [Game] = []
     
+    @Relationship var teams: [Team] = []
+    
     init(name: String, handicapIndex: Double = 0.0) {
         self.id = UUID()
         self.name = name
