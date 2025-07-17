@@ -17,9 +17,12 @@ enum GameType: String, Codable, CaseIterable {
     case nassau = "Nassau"
     case matchPlay = "Match Play"
     case strokePlay = "Stroke Play"
+    case scramble = "Scramble"
+    
+    
     case wolf = "Wolf"
     case bestBall = "Best Ball"
-    case scramble = "Scramble"
+    
     case custom = "Custom"
     
     var description: String {
