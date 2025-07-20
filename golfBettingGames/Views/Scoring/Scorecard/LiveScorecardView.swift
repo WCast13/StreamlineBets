@@ -278,7 +278,7 @@ struct LiveScorecardView: View {
                             .background(Color.purple)
                             .padding(.vertical, 2)
                         
-                        NassauStatusView(round: round)
+                        NassauStatusComponent(round: round)
                     }
                 }
             }
@@ -443,3 +443,427 @@ struct MatchPlayLegend: View {
     .modelContainer(container)
 }
 
+#Preview("Nassau Live Scorecard") {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(
+        for: Player.self, Course.self, Tee.self, Hole.self, Game.self, Round.self, PlayerScore.self, HoleScore.self,
+        configurations: config
+    )
+    
+    let context = container.mainContext
+    
+    // Create course
+    let course = Course(name: "Pebble Beach", par: 72)
+    
+    // Create holes with realistic pars and handicaps
+    let holeData: [(par: Int, handicap: Int)] = [
+        (4, 11), (5, 3), (4, 7), (4, 13), (3, 17),  // Front 9
+        (5, 1), (3, 15), (4, 9), (4, 5),
+        (4, 2), (4, 6), (3, 18), (4, 12), (5, 4),   // Back 9
+        (4, 8), (3, 10), (5, 14), (4, 16)
+    ]
+    
+    for (index, data) in holeData.enumerated() {
+        let hole = Hole(
+            number: index + 1,
+            par: data.par,
+            handicap: data.handicap,
+            distance: 350 + (index * 25) // Varying distances
+        )
+        hole.course = course
+        course.holes.append(hole)
+    }
+    
+    // Create Nassau game
+    let player1 = Player(name: "Jordan Spieth", handicapIndex: 4.2)
+    let player2 = Player(name: "Justin Thomas", handicapIndex: 5.8)
+    
+    let game = Game(
+        name: "Nassau Championship",
+        gameType: .nassau,
+        courseName: course.name,
+        courseRating: 72.1,
+        slopeRating: 129.0,
+        par: 72
+    )
+    game.course = course
+    
+    let round = Round(
+        roundNumber: 1,
+        betAmount: 75.0,
+        roundType: .full18
+    )
+    round.game = game
+    
+    // Create scores
+    let score1 = PlayerScore(player: player1)
+    let score2 = PlayerScore(player: player2)
+    
+    // Simulate exciting Nassau match - 14 holes played
+    let holeResults = [
+        (1, 4, 5),   // Jordan wins hole 1
+        (2, 5, 4),   // Justin wins hole 2
+        (3, 4, 4),   // Halved hole 3
+        (4, 4, 5),   // Jordan wins hole 4
+        (5, 3, 3),   // Halved hole 5
+        (6, 4, 5),   // Jordan wins hole 6 (Jordan 2 UP front 9)
+        (7, 3, 4),   // Jordan wins hole 7 (Jordan 3 UP front 9)
+        (8, 4, 3),   // Justin wins hole 8 (Jordan 2 UP front 9)
+        (9, 4, 4),   // Halved hole 9 (Jordan 2 UP front 9)
+        (10, 5, 6),  // Jordan wins hole 10 (Jordan 1 UP back 9)
+        (11, 4, 4),  // Halved hole 11 (Jordan 1 UP back 9)
+        (12, 3, 4),  // Jordan wins hole 12 (Jordan 2 UP back 9)
+        (13, 4, 3),  // Justin wins hole 13 (Jordan 1 UP back 9)
+        (14, 5, 4),  // Justin wins hole 14 (Back 9 AS)
+    ]
+    
+    for (hole, jordanScore, justinScore) in holeResults {
+        let hs1 = HoleScore(holeNumber: hole, grossScore: jordanScore)
+        hs1.playerScore = score1
+        hs1.hole = course.holes.first(where: { $0.number == hole })
+        score1.holeScores.append(hs1)
+        
+        let hs2 = HoleScore(holeNumber: hole, grossScore: justinScore)
+        hs2.playerScore = score2
+        hs2.hole = course.holes.first(where: { $0.number == hole })
+        score2.holeScores.append(hs2)
+    }
+    
+    round.scores = [score1, score2]
+    
+    context.insert(course)
+    context.insert(player1)
+    context.insert(player2)
+    context.insert(game)
+    context.insert(round)
+    
+    @State var scores: [UUID: Int] = [
+        score1.id: 4,
+        score2.id: 5
+    ]
+    
+    struct NassauPreviewWrapper: View {
+        let round: Round
+        @State var scores: [UUID: Int]
+        @State private var selectedView = 0
+        
+        var body: some View {
+            NavigationView {
+                VStack(spacing: 0) {
+                    // Header with game info
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Nassau Championship")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                            
+                            HStack(spacing: 16) {
+                                Text("Pebble Beach")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                
+                                Text("$75 Nassau")
+                                    .font(.subheadline)
+                                    .foregroundColor(.purple)
+                                    .fontWeight(.medium)
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text("Hole 15")
+                                .font(.headline)
+                                .foregroundColor(.accentColor)
+                            
+                            Text("Par 4, 425 yds")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.05))
+                    
+                    // View selector
+                    Picker("View", selection: $selectedView) {
+                        Text("Live Scorecard").tag(0)
+                        Text("Nassau Only").tag(1)
+                        Text("Summary").tag(2)
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .padding()
+                    
+                    // Content based on selection
+                    ScrollView {
+                        switch selectedView {
+                        case 0:
+                            // Full Live Scorecard with Nassau
+                            LiveScorecardView(
+                                round: round,
+                                currentHoleNumber: 15,
+                                scores: $scores
+                            )
+                            .padding()
+                            
+                        case 1:
+                            // Nassau Components Only
+                            VStack(spacing: 16) {
+                                NassauStatusComponent(round: round)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.02))
+                                    .cornerRadius(12)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color.purple.opacity(0.3), lineWidth: 1)
+                                    )
+                                
+                                // Additional Nassau insights
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Current Nassau Status")
+                                        .font(.headline)
+                                        .foregroundColor(.purple)
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        HStack {
+                                            Text("• Front 9:")
+                                                .font(.subheadline)
+                                            Spacer()
+                                            Text("Jordan 2 UP (Complete)")
+                                                .font(.subheadline)
+                                                .foregroundColor(.blue)
+                                        }
+                                        
+                                        HStack {
+                                            Text("• Back 9:")
+                                                .font(.subheadline)
+                                            Spacer()
+                                            Text("All Square")
+                                                .font(.subheadline)
+                                                .foregroundColor(.orange)
+                                        }
+                                        
+                                        HStack {
+                                            Text("• Overall:")
+                                                .font(.subheadline)
+                                            Spacer()
+                                            Text("Jordan 2 UP")
+                                                .font(.subheadline)
+                                                .foregroundColor(.blue)
+                                        }
+                                    }
+                                }
+                                .padding()
+                                .background(Color.gray.opacity(0.05))
+                                .cornerRadius(8)
+                                
+                                // Potential press info
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Press Watch")
+                                        .font(.headline)
+                                        .foregroundColor(.orange)
+                                    
+                                    Text("If Justin falls 2 down on the back 9, a press bet may be initiated from the next hole.")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding()
+                                .background(Color.orange.opacity(0.05))
+                                .cornerRadius(8)
+                            }
+                            .padding()
+                            
+                        case 2:
+                            // Summary Card
+                            VStack(spacing: 16) {
+                                NassauSummaryCard(round: round)
+                                
+                                // Match progression
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Match Progression")
+                                        .font(.headline)
+                                        .foregroundColor(.purple)
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Front 9 Complete: Jordan won 2 UP")
+                                            .font(.subheadline)
+                                            .foregroundColor(.blue)
+                                        
+                                        Text("Back 9 Status: All Square through 5 holes")
+                                            .font(.subheadline)
+                                            .foregroundColor(.orange)
+                                        
+                                        Text("Overall Status: Jordan leads 2 UP")
+                                            .font(.subheadline)
+                                            .foregroundColor(.blue)
+                                        
+                                        Text("Remaining: 4 holes to play")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                .padding()
+                                .background(Color.gray.opacity(0.05))
+                                .cornerRadius(8)
+                                
+                                // Betting implications
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Betting Status ($75 Nassau)")
+                                        .font(.headline)
+                                        .foregroundColor(.green)
+                                    
+                                    HStack {
+                                        VStack(alignment: .leading) {
+                                            Text("Jordan Leading:")
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                            Text("• Front 9: $75")
+                                                .font(.caption)
+                                                .foregroundColor(.blue)
+                                            Text("• Overall: Leading")
+                                                .font(.caption)
+                                                .foregroundColor(.blue)
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        VStack(alignment: .trailing) {
+                                            Text("Still in Play:")
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                            Text("Back 9: $75")
+                                                .font(.caption)
+                                                .foregroundColor(.orange)
+                                            Text("Overall: $75")
+                                                .font(.caption)
+                                                .foregroundColor(.orange)
+                                        }
+                                    }
+                                }
+                                .padding()
+                                .background(Color.green.opacity(0.05))
+                                .cornerRadius(8)
+                            }
+                            .padding()
+                            
+                        default:
+                            EmptyView()
+                        }
+                    }
+                }
+                .navigationTitle("Nassau Live Scoring")
+                .navigationBarTitleDisplayMode(.inline)
+            }
+        }
+    }
+    
+    return NassauPreviewWrapper(round: round, scores: scores)
+        .modelContainer(container)
+}
+
+// Additional preview showing different Nassau scenarios
+#Preview("Nassau - Press Scenario") {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(
+        for: Player.self, Course.self, Tee.self, Hole.self, Game.self, Round.self, PlayerScore.self, HoleScore.self,
+        configurations: config
+    )
+    
+    let context = container.mainContext
+    
+    // Create course
+    let course = Course(name: "TPC Sawgrass", par: 72)
+    
+    // Create basic holes
+    for i in 1...18 {
+        let hole = Hole(
+            number: i,
+            par: i == 17 ? 3 : (i == 2 || i == 9 || i == 11 || i == 16 ? 5 : 4),
+            handicap: i,
+            distance: 400
+        )
+        hole.course = course
+        course.holes.append(hole)
+    }
+    
+    // Create Nassau game with press scenario
+    let player1 = Player(name: "Dustin Johnson", handicapIndex: 3.1)
+    let player2 = Player(name: "Brooks Koepka", handicapIndex: 4.7)
+    
+    let game = Game(
+        name: "Press Nassau",
+        gameType: .nassau,
+        courseName: course.name,
+        courseRating: 74.0,
+        slopeRating: 132.0,
+        par: 72
+    )
+    game.course = course
+    
+    let round = Round(
+        roundNumber: 1,
+        betAmount: 100.0,
+        roundType: .full18
+    )
+    round.game = game
+    
+    // Create scores showing press scenario
+    let score1 = PlayerScore(player: player1)
+    let score2 = PlayerScore(player: player2)
+    
+    // Create scenario where player 2 is down and needs press
+    let holeResults = [
+        (1, 4, 5), (2, 5, 4), (3, 4, 5), (4, 4, 3), (5, 4, 4),  // Front 9
+        (6, 5, 4), (7, 4, 5), (8, 4, 4), (9, 4, 4),
+        (10, 4, 5), (11, 5, 4), (12, 4, 5), (13, 4, 3), (14, 4, 5), // Back 9 - DJ pulling ahead
+        (15, 4, 4), (16, 5, 6)  // More holes where DJ is dominating
+    ]
+    
+    for (hole, djScore, brooksScore) in holeResults {
+        let hs1 = HoleScore(holeNumber: hole, grossScore: djScore)
+        hs1.playerScore = score1
+        hs1.hole = course.holes.first(where: { $0.number == hole })
+        score1.holeScores.append(hs1)
+        
+        let hs2 = HoleScore(holeNumber: hole, grossScore: brooksScore)
+        hs2.playerScore = score2
+        hs2.hole = course.holes.first(where: { $0.number == hole })
+        score2.holeScores.append(hs2)
+    }
+    
+    round.scores = [score1, score2]
+    
+    context.insert(course)
+    context.insert(player1)
+    context.insert(player2)
+    context.insert(game)
+    context.insert(round)
+    
+    @State var scores: [UUID: Int] = [
+        score1.id: 4,
+        score2.id: 5
+    ]
+    
+    return VStack {
+        Text("Nassau with Press Scenario")
+            .font(.headline)
+            .padding()
+        
+        Text("Dustin Johnson dominating - Press bets likely")
+            .font(.subheadline)
+            .foregroundColor(.orange)
+            .padding(.bottom)
+        
+        NassauStatusComponent(round: round)
+            .padding()
+            .background(Color.gray.opacity(0.02))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.purple.opacity(0.3), lineWidth: 1)
+            )
+            .padding()
+        
+        Spacer()
+    }
+    .modelContainer(container)
+}
