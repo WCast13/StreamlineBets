@@ -1,5 +1,5 @@
 //
-//  NassauComponets.swift
+//  NassauComponents.swift
 //  golfBettingGames
 //
 //  Created by William Castellano on 7/17/25.

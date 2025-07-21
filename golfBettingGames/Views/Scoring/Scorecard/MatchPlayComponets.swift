@@ -1,5 +1,5 @@
 //
-//  MatchPlayComponets.swift
+//  MatchPlayComponents.swift
 //  golfBettingGames
 //
 //  Created by William Castellano on 7/14/25.
