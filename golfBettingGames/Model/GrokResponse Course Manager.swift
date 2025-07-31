@@ -12,7 +12,7 @@ import Foundation
 /// Network manager class for handling API requests
 class NetworkManager {
     static let shared = NetworkManager()
-    
+     
     private init() {}
     
     private let baseURL = "https://zylalabs.com/api/2029/golf+courses+data+api/"
