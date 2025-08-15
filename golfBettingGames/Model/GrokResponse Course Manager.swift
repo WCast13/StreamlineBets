@@ -16,7 +16,7 @@ class NetworkManager {
     private init() {}
     
     private let baseURL = "https://zylalabs.com/api/2029/golf+courses+data+api/"
-    private let apiKey = "5958|UvW3e4nwFNwO7sEVeo7TVMPGfzJZrPOojRi8Dwql" // Replace with your actual API key
+    private let apiKey = "5958|UvW3e4nwFNwO7sEVeo7TVMPGfzJZrPOojRi8Dwql"
     
     private let session: URLSession = {
         let config = URLSessionConfiguration.default
